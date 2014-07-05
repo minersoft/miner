@@ -1,0 +1,39 @@
+echo >& stdout.out
+PRINT >>sys.stderr, "Going to sys.stderr"
+echo on
+echo Start
+for i in [1,2,3]
+  @echo Set i to $i
+  if $i == 1
+    @echo $i == 1 - True
+  elif $i == 2
+    @echo $i == 2 - True
+  else
+    @echo $i == 3  
+  fi
+done
+echo off
+
+echo push
+echo > stdout2.out
+if $?abc
+echo $abc
+else
+echo no abc
+fi
+echo pop
+
+@echo on
+@echo with @
+echo without @
+@echo off
+
+PRINT "---DONE"
+
+echo push
+echo > stdout2.out
+echo TEst2
+echo pop
+
+RETURN 1+1
+

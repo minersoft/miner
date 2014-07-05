@@ -1,0 +1,4 @@
+PARAM ip?=1.1.1.1
+USE pcap
+READ $* | PASS ip.source="$ip" IF tcp.isRequest, ip.dest="$ip" IF not tcp.isRequest | WRITE $>
+

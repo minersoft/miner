@@ -1,0 +1,34 @@
+#!/bin/sh
+
+prog=$0
+dir=`dirname $prog`
+
+if ( which pypy > /dev/null 2>&1; ) ; then
+  exe=pypy
+elif ( which python > /dev/null 2>&1; ) ; then
+  exe=python
+else
+  echo No python interpreter found
+  exit 1
+fi
+
+upgrade=$dir/upgrade
+if [[ -x $upgrade ]] ; then
+  (cd $dir ; ./upgrade)
+  rm -f $upgrade
+fi 
+
+repos=
+
+# ignore SIGHUP signal
+trap '' HUP
+
+saved_terminal_settings=`stty -g`
+
+$exe $dir/miner_main.py "$repos" "$@"
+
+rc=$?
+if [[ $rc > 127 ]] ; then
+  stty $saved_terminal_settings
+fi
+exit $rc

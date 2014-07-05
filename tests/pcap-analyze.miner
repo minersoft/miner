@@ -1,0 +1,12 @@
+USAGE "Analyzes pcap files" *="Name of pcap file to analyze"
+
+USE pcap
+
+READ $*  |
+    IF  (tcp.sport ==80 or tcp.dport==80)| IF not tcp.isRequest |
+    FOR DISTINCT tcp.stream SELECT first(tcp.sport), first(tcp.dport), first(ip.source), first(ip.dest), \
+        sum(len(tcp.data)) as totSize, segments(tcp.relativeSeq, len(tcp.data)) as seg |
+    SORTBY stream |
+    SELECT stream, dest as clientIp, dport as clientPort, source as serverIp, sport as serverPort, totSize, \
+           seg.getSize() as maxSize, seg.getNetSize() as netSize, seg.getSizeOfBlocks(1MB) as blocksSize, seg.size as numSegments, seg.segments, seg.ranges |
+    STDOUT blocksSize="B" clientPorts="i" serverPort="i"

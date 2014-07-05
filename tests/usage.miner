@@ -1,0 +1,6 @@
+USAGE "This script does something" \
+      [top="top records number" DEFAULT "100"] \
+      [filter="optional filter to use" DEFAULT "youtube"] \
+      *="input files" \
+      >="output file"
+

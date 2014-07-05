@@ -1,0 +1,17 @@
+EVAL a
+
+PRINT a+b
+
+PRINT 1/0
+
+READ x | STDOT
+
+if
+echo should not be here
+fi
+
+for i in 1
+echo shouldn't be here
+done
+
+

@@ -1,0 +1,22 @@
+echo stdout
+echo push
+echo > file1.out
+echo file1
+echo push
+echo > file2.out
+echo file2
+echo push
+echo > file3.out
+echo file3
+echo pop
+echo file2
+echo pop
+echo file1
+echo pop
+
+echo push
+echo >> file3.out
+echo file3
+echo pop
+echo stdout
+
