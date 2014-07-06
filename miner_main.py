@@ -88,12 +88,15 @@ miner_globals.minerBaseDir = os.path.dirname(os.path.abspath(__file__))
 if miner_globals.minerBaseDir not in sys.path:
     sys.path.append(miner_globals.minerBaseDir)
 
+# add my lib folder to python path
+sys.path.append(os.path.join(miner_globals.minerBaseDir, "lib"))
+
 if options.pyreadlineLog:
     miner_globals.setPyreadlineLog(options.pyreadlineLog)
 
 miner_globals.setHomeDir(options.homedir)
 
-MINERRC_FILE = os.path.join(miner_globals.getHomeDir(), ".miner2rc")
+MINERRC_FILE = os.path.join(miner_globals.getHomeDir(), ".minerrc")
 
 from m import executor
 
