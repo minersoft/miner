@@ -53,15 +53,6 @@ miner_globals.addExtensionToTargetMapping(".log", "log")
 miner_globals.addExtensionToTargetMapping(".json", "json")
 miner_globals.addExtensionToTargetMapping("stdout", "csv")
 
-miner_globals.addParserClassMapping("request", "m.http.HttpRequest", "http request header")
-miner_globals.addParserClassMapping("response", "m.http.HttpResponse", "http response header")
-miner_globals.addParserClassMapping("uri", "m.http.Uri", "URL string")
-
-# Completion symbols
-miner_globals.addCompletionSymbol('request', m.http.HttpRequest("GET / HTTP/1.1\r\n\r\n"))
-miner_globals.addCompletionSymbol('response', m.http.HttpResponse("HTTP/1.1 200 OK\r\n\r\n"))
-miner_globals.addCompletionSymbol('uri', m.http.Uri("http://host:80/path?var=value"))
-
 DataProvider.registerDataProvider("file", FileDataProvider)
 DataProvider.registerDataProvider("repository", RepositoryDataProvider)
 

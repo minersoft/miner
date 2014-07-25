@@ -1,10 +1,6 @@
 #
-# Copyright Qwilt, 2012
+# Copyright Michael Groys, 2012-2014
 #
-# The code contained in this file may not be used by any other entities without explicit written permission from Qwilt.
-#
-# Author: michaelg
-# 
 
 import miner_globals
 import m.common as common
@@ -56,7 +52,7 @@ class ParseCommand(TypicalCommand):
     NAME = "PARSE"
     SHORT_HELP = "PARSE <id> [FROM <expression>]"
     @staticmethod
-    def COMPLETION_STATE():
+    def COMPLETION_STATE(input, pos):
         return  sorted(miner_globals.getParserObjects()) + ["FROM", "AS"]
     @staticmethod
     def LONG_HELP():

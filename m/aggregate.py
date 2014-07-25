@@ -1,10 +1,6 @@
 #
-# Copyright Qwilt, 2012
+# Copyright Michael Groys, 2012-2014
 #
-# The code contained in this file may not be used by any other entities without explicit written permission from Qwilt.
-#
-# Author: michaelg
-# 
 
 #
 # This file contains implementation of various aggregation commands

@@ -191,6 +191,10 @@ def getCompletionState():
                     position += 1
                 if position == beginIndex:
                     state = common.COMPLETE_TARGET
+        elif isinstance(state, types.FunctionType):
+            endOfCommand = line.find("|", beginIndex)
+            input = line[start:endOfCommand]
+            state = state(input, beginIndex-start)
         return state
     else:
         return common.COMPLETE_NONE
@@ -283,13 +287,13 @@ class RepositoryFileCompleter(FileCompleter):
         if state == 0:
             self.repositoryPathObj = repository_path.RepositoryPath()
         
-        if "/" in text:
+        if os.sep in text:
             return FileCompleter.complete(self, text, state)
         else:
             # Explicit insert to support file word separator
             if state == 0:
                 self.completions = []
-                self.targetList = [t+"/" for t in self.repositoryPathObj.getTargetList()]
+                self.targetList = [t+os.sep for t in self.repositoryPathObj.getTargetList()]
                 self.targetList = filter(lambda var: var.startswith(text), sorted(self.targetList))
                 if len(self.targetList) == 0:
                     return None
@@ -335,15 +339,15 @@ class ImportPathCompleter:
                 return []
             return self.getNodeCompletions(text, parentPath)
     def getNodeCompletions(self, text, parentPath):
-        self.fileCompleter.defaultPrefix = parentPath + "/"
-        self.dirCompleter.defaultPrefix = parentPath + "/"
-        fileText = text.replace(".", "/")
+        self.fileCompleter.defaultPrefix = parentPath + os.sep
+        self.dirCompleter.defaultPrefix = parentPath + os.sep
+        fileText = text.replace(".", os.sep)
         dirs = self.dirCompleter.getCompletions(fileText)
         files = [f.replace(".py", "") for f in self.fileCompleter.getCompletions(fileText)]
         files = filter(lambda file: file!= "__init__", files)
         
         completions = sorted(dirs+files)
-        completions = [ c.replace("/", ".") for c in completions]
+        completions = [ c.replace(os.sep, ".") for c in completions]
         textFragments = text.rsplit(".", 1)
         if len(textFragments) == 2:
             completions = [(textFragments[0]+"."+c) for c in completions]
