@@ -53,7 +53,22 @@ class ParseCommand(TypicalCommand):
     SHORT_HELP = "PARSE <id> [FROM <expression>]"
     @staticmethod
     def COMPLETION_STATE(input, pos):
-        return  sorted(miner_globals.getParserObjects()) + ["FROM", "AS"]
+        if pos == 0:
+            return common.COMPLETE_NONE
+        inputTokens = input[:pos].split()
+        l = len(inputTokens)
+        if input[pos-1].isspace():
+            l += 1
+        #print "l=%d\r\n" % l
+        if l==1:
+            return common.COMPLETE_NONE
+        elif l==2:
+            return list(miner_globals.getParserObjects())
+        elif l==3:
+            return ["FROM"]
+        else:
+            return common.COMPLETE_SYMBOLS
+
     @staticmethod
     def LONG_HELP():
         s  = """PARSE <id>

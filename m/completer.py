@@ -138,17 +138,22 @@ def getCompletionState():
     beginIndex = readline.get_begidx()
     endIndex = readline.get_endidx()
     # check if we are in string (only double quotes are considered)
-    inString = False
+    inString = ''
     position = 0
     countBackspaces = 0
     while position<beginIndex:
-        if line[position] == '"' and countBackspaces%2==0:
-            inString = not inString
-            countBackspaces = 0
-        elif inString and line[position] == '\\':
-            countBackspaces += 1
+        ch = line[position]
+        if inString:
+            if ch == inString and countBackspaces%2==0:
+                inString = ''
+                countBackspaces = 0
+            elif ch == '\\':
+                countBackspaces += 1
+            else:
+                countBackspaces = 0
         else:
-            countBackspaces = 0
+            if ch == '"' or ch=="'":
+                inString = ch
         position += 1
     if inString:
         return common.COMPLETE_NONE
@@ -181,7 +186,7 @@ def getCompletionState():
     theSymbolCompleter.setHelpClass(helpClass)
     if helpClass:
         state = common.HelpClass.getCompletionState(helpClass)
-        if state == common.COMPLETE_FILE:
+        if state == 100: ##common.COMPLETE_FILE:
             # check if it is complete tartget
             while position < beginIndex and line[position].isspace():
                 position += 1
@@ -193,7 +198,10 @@ def getCompletionState():
                     state = common.COMPLETE_TARGET
         elif isinstance(state, types.FunctionType):
             endOfCommand = line.find("|", beginIndex)
-            input = line[start:endOfCommand]
+            if endOfCommand<0:
+                input = line[start:]
+            else:
+                input = line[start:endOfCommand]
             state = state(input, beginIndex-start)
         return state
     else:

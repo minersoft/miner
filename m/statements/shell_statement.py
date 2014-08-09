@@ -5,6 +5,7 @@ import os.path
 import m.common as common
 import subprocess
 import glob
+import sys
 
 def p_shell_statement(p):
     '''statement : SHELL filename_list'''
@@ -78,7 +79,10 @@ class LSStatement(base.StatementBase):
         for file in files:
             cumFiles += glob.glob(os.path.expanduser(file))
         try:
-            subprocess.call(["/bin/ls", "-lh"] + cumFiles)
+            if sys.platform == "win32":
+                subprocess.call(" ".join(["DIR"] + cumFiles), shell=True)
+            else:
+                subprocess.call(["/bin/ls", "-lh"] + cumFiles)
         except OSError as e:
             print "Execution of ls failed:", str(e)
 

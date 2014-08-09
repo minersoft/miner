@@ -9,8 +9,8 @@ def p_usage_statement(p):
 # usage statement
 
 def p_usage_params(p):
-    '''usage_params : usage_param'''
-    p[0] = [ p[1] ]
+    '''usage_params :'''
+    p[0] = [  ]
 
 def p_usage_params_param(p):
     '''usage_params :  usage_params usage_param'''

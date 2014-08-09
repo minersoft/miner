@@ -5,7 +5,7 @@ class DataProvider:
     @staticmethod
     def createDataProvider(uriList, streamType, moreVars):
         if len(uriList) == 0:
-            raise NoFilesInPattern("")
+            raise common.NoFilesInPattern("")
         colonLoc = uriList[0].find("://")
         if colonLoc==-1:
             dataProviderName = "file"
@@ -17,7 +17,7 @@ class DataProvider:
                 
         klass = DataProvider._dataProviderClasses.get(dataProviderName)
         if not klass:
-            raise common.UnknownDataProvider(dataProvider)
+            raise common.UnknownDataProvider(dataProviderName)
         return klass(uriList, streamType, moreVars)
     @staticmethod
     def registerDataProvider(dataProviderName, dataProviderClass):

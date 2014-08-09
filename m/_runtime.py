@@ -202,12 +202,14 @@ def expandFiles(fileNamePatterns, shouldOpen=True, checkPattern=True):
     #print "checkPattern", checkPattern, "fileNamePatterns", fileNamePatterns, "abortOnError", abortOnError
     if checkPattern:
         for p in fileNamePatterns:
-            patternParts = p.split(':', 1)
-            pattern = os.path.expanduser(patternParts[0])
-            if len(patternParts) > 1:
-                itemSelector = patternParts[1]
-            else:
+            colonPos = p.rfind(":")
+            if colonPos==-1 or (colonPos==1 and len(p)>=3 and p[2]=='\\'):
+                pattern = p
                 itemSelector = ""
+            else:
+                pattern = p[0:colonPos]
+                itemSelector = p[colonPos+1:]
+            pattern = os.path.expanduser(pattern)
             # check if needed recursive search of files
             posOf3Dots = pattern.find(".../")
             if posOf3Dots != -1:

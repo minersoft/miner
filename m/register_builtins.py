@@ -42,7 +42,7 @@ miner_globals.addTargetToClassMapping("stdout", None, "io_targets.oStdout", "dum
 miner_globals.addTargetToClassMapping("less", None, "io_targets.oLess", "dumps user friendly fromatted output to less pager")
 miner_globals.addTargetToClassMapping("log", "io_targets.iLog", "io_targets.oLog", "Processes text file by splitting it to words. Created record is (line, words, NR).\nFS= may specify alternative regular regular expression for splitting.")
 miner_globals.addTargetToClassMapping("raw", "io_targets.iRaw", "io_targets.oRaw", "Precosses text file without splitting into words. Record is (line,).")
-miner_globals.addTargetToClassMapping("json", "io_targets.iJson", None, "Reads json files to 'obj' variable")
+miner_globals.addTargetToClassMapping("json", "io_targets.iJson", "io_targets.oJson", "Reads json files to 'obj' variable or writes all variables to json list")
 miner_globals.addTargetToClassMapping("tsv", "io_targets.iTsv", "io_targets.oTsv", "tab separated value text")
 
 miner_globals.addExtensionToTargetMapping(".csv", "csv")

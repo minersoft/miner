@@ -65,8 +65,12 @@ class InstallStatement(base.StatementBase):
     @staticmethod
     def COMPLETION_STATE(input, pos):
         from m.tools.toolbox import ToolBox
+        if pos==0:
+            return common.COMPLETE_NONE
         tokens = input[:pos].split()
         l = len(tokens)
+        if input[pos-1].isspace():
+            l += 1
         if l==3:
             return common.COMPLETE_FILE
         elif l==2:

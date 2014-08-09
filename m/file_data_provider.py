@@ -32,7 +32,11 @@ class FileDataProvider(DataProvider):
         self.myFileNames = [name for name in expandFiles(fileNamePatterns, shouldOpen=False, checkPattern=self.expandPatterns) ]
 
         if not self._streamType:
-            name = self.myFileNames[0].split(":",1)[0]
+            colonPos = self.myFileNames[0].rfind(":")
+            if colonPos==-1 or (colonPos==1 and len(self.myFileNames)>=3 and self.myFileNames[2]=='\\'):
+                name = self.myFileNames[0]
+            else:
+                name = self.myFileNames[0][0:colonPos]
             ext = os.path.splitext(name)[1]
             if ext == ".gz":
                 # try to get prev extension before gzip

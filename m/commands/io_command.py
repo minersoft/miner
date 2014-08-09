@@ -129,8 +129,25 @@ Available targets are:
                 s += "    %-20s - %s\n" % (t[0]+"["+t[1]+"]",t[2].replace('\n','\n'+' '*27))
         return s
 
-    COMPLETION_STATE = COMPLETE_FILE
-
+    @staticmethod
+    def COMPLETION_STATE(input, position):
+        # assume we are in target name
+        position -= 1
+        while position >= 0 and (input[position].isalnum() or input[position]=='_'):
+            position -= 1
+        if (position<0) or (input[position]!="<"):
+            return COMPLETE_FILE
+        position -= 1
+        while position>=0 and input[position].isspace():
+            position -= 1
+        # this should be command command
+        while position>=0 and (input[position].isalnum() or input[position]=='_'):
+            position -= 1
+        if position < 0:
+            return COMPLETE_TARGET
+        else:
+            return COMPLETE_FILE
+    
     def __init__(self, fileNamePatterns, sourceType=None, streamVars=None):
         CommandBase.__init__(self)
         self.dataProvider = m.data_provider.DataProvider.createDataProvider(fileNamePatterns, sourceType, streamVars)
@@ -275,7 +292,9 @@ Available targets are:
 """ + Destination.getTargetHelp()
         return s
 
-    COMPLETION_STATE = COMPLETE_FILE
+    @staticmethod
+    def COMPLETION_STATE(input, position):
+        return Source.COMPLETION_STATE(input, position)
 
     def __init__(self, fileName, destinationType=None, streamVars=None):
         CommandBase.__init__(self)
