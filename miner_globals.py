@@ -162,7 +162,6 @@ def getRepositoryFilePattern(target):
 
 importMap = {"io_targets": ["m.io_targets", None],
              "_runtime": ["m._runtime", None],
-             "http":["m.http", None],
              "aggregate":["m.aggregate", None],
              }
 

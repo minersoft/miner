@@ -2,7 +2,6 @@ import miner_globals
 import runtime
 import re
 import collections
-import m.http
 from data_provider import DataProvider
 from file_data_provider import FileDataProvider
 from repository_data_provider import RepositoryDataProvider
