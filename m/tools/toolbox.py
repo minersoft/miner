@@ -61,13 +61,13 @@ class ToolBox(object):
         return miner_globals.getToolPath(toolName)
     
     def getLibsPath(self):
-        return os.path.join(getToolsPath(), "Libs")
+        return os.path.join(self.getToolsPath(), "Libs")
     
     def getDownloadsPath(self):
-        return os.path.join(getToolsPath(), "Downloads")
+        return os.path.join(self.getToolsPath(), "Downloads")
     
     def getRecoveryPath(self):
-        return os.path.join(getToolsPath(), "Recovery")
+        return os.path.join(self.getToolsPath(), "Recovery")
     
     def createToolsPath(self):
         path = self.getToolsPath()
@@ -120,10 +120,26 @@ class ToolBox(object):
     def commit(self):
         if (self._installedTools is not None) and self._installedTools.wasModified:
             self._installedTools.save(self.installedToolsPath)
-    def install(self, toolName, url=None, version=None):
+    def _createSource(self, url, version, build):
         from source_base import SourceBase
         from source_local_dir import SourceLocalDir
         from source_archive import SourceArchive
+        from source_http import SourceHttp
+        method, path = SourceBase.spliturl(url)
+        if (method=="" or method=="file") and os.path.isfile(path):
+            return SourceArchive("file", path, version, build)
+        elif (method=="" or method=="dir" or method=="file") and os.path.isdir(path):
+            return SourceLocalDir("dir", path, version, build)
+        elif method=="" or method=="file" or method=="dir":
+            print "File %s is of invalid type or doesn't exist" % path
+            return False
+        elif method in ["http", "https", "ftp"]:
+            return SourceHttp(method, path, version, build)
+        else:
+            print "Unsupported URL scheme: %s" % url
+            return None
+        
+    def install(self, toolName, url=None, version=None, build=None):
         installedTools = self.getInstalledTools()
         if toolName in installedTools:
             print "Tool %s already installed" % toolName
@@ -134,17 +150,11 @@ class ToolBox(object):
                 print "Unknown tool %s" % tool
                 return False
             raise NotImplemented
-        method, path = SourceBase.spliturl(url)
-        if (method=="" or method=="file") and os.path.isfile(path):
-            res = SourceArchive().install("file", path, toolName, self)
-        elif (method=="" or method=="dir" or method=="file") and os.path.isdir(path):
-            res = SourceLocalDir().install("dir", path, toolName, self)
-        elif method=="" or method=="file" or method=="dir":
-            print "File %s is of invalid type or doesn't exist" % path
-            return False
-        else:
+        src = self._createSource(url, version, build)
+        if not src:
             print "Unsupported URL scheme: %s" % url
             return False
+        res = src.install(toolName, self)
         if res:
             t = tool.createTool(toolName, "local", description="local")
             installedTools.add(t)
@@ -173,6 +183,8 @@ class ToolBox(object):
         return True
     
     def update(self, toolName, url=None, version=None):
+        if toolName == "miner":
+            return self.updateMiner(url, version)
         res = self.uninstall(toolName)
         if not res:
             return False
@@ -211,17 +223,17 @@ class ToolBox(object):
             print "  %-11s %-14s - %s" % (isInstalled, toolName, description)
 
 
-    def getMinerTool():
+    def getMinerTool(self):
         return {"path": "local", "version": miner_version.version, "build": miner_version.build }
     
     def isToolInstalled(self, toolName):
-         installedTools = self.getInstalledTools()
-         if toolName in installedTools:
-             return True
-         if os.path.exists(self.getToolPath(toolName)):
-             print "Path %s exists but tool %s was not installed" % (self.getToolPath(toolName), toolName)
-             return True
-         return False
+        installedTools = self.getInstalledTools()
+        if toolName in installedTools:
+            return True
+        if os.path.exists(self.getToolPath(toolName)):
+            print "Path %s exists but tool %s was not installed" % (self.getToolPath(toolName), toolName)
+            return True
+        return False
 
     def updateKnownTools(self):
         pass
@@ -243,3 +255,24 @@ class ToolBox(object):
         else:
             print "Nothing to update"
 
+    def updateMiner(self, url=None, version=None, build=None):
+        minerSrc = self._createSource(url, version, build)
+        if not minerSrc:
+            print "Unsupported URL scheme: %s" % url
+            return False
+        res = minerSrc.prepare("miner", self)
+        if not res:
+            print "Miner upgrade failed"
+            return False
+        newMinerPath = minerSrc.getPreparedToolRootDir()
+        if not newMinerPath:
+            print "Miner upgrade failed - invalid miner package"
+            return False
+        self._updateMinerFromPath(newMinerPath)
+    def _updateMinerFromPath(self, newMinerPath):
+        # os.execl
+        print sys.executable, os.path.join(newMinerPath,"miner_upgrade.py"), \
+                 "-v", miner_version.version, "-b", str(miner_version.build), \
+                 "-d", miner_globals.minerBaseDir, "-r", self.getRecoveryPath()
+        
+        

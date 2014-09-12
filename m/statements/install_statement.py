@@ -48,10 +48,7 @@ def p_update_statement(p):
         url = p[3]
     if l >= 3:
         toolName = p[2]
-    if toolName == "miner":
-        p[0] = UpdateMiner(url, version)
-    else:
-        p[0] = UpdateStatement(toolName, url, version)
+    p[0] = UpdateStatement(toolName, url, version)
 
 class InstallStatement(base.StatementBase):
     NAME = "INSTALL"
@@ -74,7 +71,7 @@ class InstallStatement(base.StatementBase):
         if l==3:
             return common.COMPLETE_FILE
         elif l==2:
-            return list(ToolBox().getKnownTools())
+            return list(ToolBox().getKnownTools().keys())
         else:
             return []
 
@@ -122,6 +119,22 @@ UPDATE
     updates tool.
     second version shows all available updates
 """
+    @staticmethod
+    def COMPLETION_STATE(input, pos):
+        from m.tools.toolbox import ToolBox
+        if pos==0:
+            return common.COMPLETE_NONE
+        tokens = input[:pos].split()
+        l = len(tokens)
+        if input[pos-1].isspace():
+            l += 1
+        if l==3:
+            return common.COMPLETE_FILE
+        elif l==2:
+            return list(ToolBox().getKnownTools().keys())+["miner"]
+        else:
+            return []
+    
     def __init__(self, toolName=None, url=None, version="0"):
         base.StatementBase.__init__(self)
         self.toolName = toolName
@@ -134,39 +147,11 @@ UPDATE
         if not self.toolName:
             toolbox.printAvailableUpdates()
         else:
-            installedTool = InstallStatement.INSTALLED_TOOLS.get(self.toolName, None)
-            if not installedTool:
-                print "Cannot update not installed tool %s" % self.toolName
-                return
-            if installedTool['version'] == 'local':
-                print "Cannot update local tool %s" % self.toolName
-                return
-            knownTool = InstallStatement.KNOWN_TOOLS.get(self.toolName, None)
-            if not knownTool:
-                print "%s is not registered in miner warehouse" % self.toolName
-                return
-            if not self.versionLess(installedTool, knownTool):
-                print "No need to update %s" % self.toolName
-                return
-            if os.path.islink(self.getToolLocation()):
-                os.unlink(self.getToolLocation())
-            else:
-                shutil.rmtree(self.getToolLocation(), True)
-            self.path = knownTool['path']
-            self.version = knownTool['version']
-            self.build = knownTool.get('build', 0)
-            InstallStatement.execute(self)
+            toolbox.update(self.toolName, self.url, self.version)
 
-
-class UpdateMiner(UpdateStatement):
-    def __init__(self, url, version):
-        UpdateStatement.__init__(self, "miner", url, version)
-    def execute(self):
-        pass
 
 def getToolVersion(toolName):
-    InstallStatement.loadInstalledTools()
-    return InstallStatement.getToolVersion(toolName)
+    raise NotImplementedError()
  
 miner_globals.getToolVersion = getToolVersion     
 miner_globals.addStatementName("INSTALL")

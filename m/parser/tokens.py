@@ -205,7 +205,7 @@ def t_rSTRING(t):
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value, 'ID')
-    if t.type in ['READ', 'RREAD', 'WRITE', 'STDOUT', 'LESS', 'SOURCE', 'HELP', 'SHELL', 'CD', 'LS', 'TEE', 'INSTALL', 'UNINSTALL']:
+    if t.type in ['READ', 'RREAD', 'WRITE', 'STDOUT', 'LESS', 'SOURCE', 'HELP', 'SHELL', 'CD', 'LS', 'TEE', 'INSTALL', 'UNINSTALL', 'UPDATE']:
         # we need to switch to the special lexing state which accepts only files
         t.lexer.begin('files')
     elif t.type == 'PARAM':
