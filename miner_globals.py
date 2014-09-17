@@ -575,4 +575,24 @@ def setIsInteractive(aIsInteractive):
     global _isInteractive
     _isInteractive = aIsInteractive
 
+_registry = None
+def loadRegistry():
+    from m.utilities import loadFromJson, saveToJson
+    global _registry
+    _registry = loadFromJson(os.path.join(getToolsPath(), "registry.json"))
+    if _registry:
+        for key, value in _registry.iteritems():
+            setScriptParameter(key, str(value))
+    else:
+        # init with miner warehouse path and save
+        _registry = {"MINER_WAREHOUSE": "https://api.github.com/repos/minersoft/warehouse/tarball"}
+        saveToJson(_registry, os.path.join(getToolsPath(), "registry.json"))
+
+def updateRegistry(name, value):
+    from m.utilities import saveToJson
+    global _registry
+    if _registry is None:
+        loadRegistry()
+    _registry[name] = value
+    saveToJson(_registry, os.path.join(getToolsPath(), "registry.json"))
     

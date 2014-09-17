@@ -118,6 +118,7 @@ if options.listscripts:
     listScripts(miner_globals.getToolsPath())
     sys.exit(0)
 
+miner_globals.loadRegistry()
 miner_globals._executeScript = executor.executeScript
 
 miner_globals.setScriptParameters(args)

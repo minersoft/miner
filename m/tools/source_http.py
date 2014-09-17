@@ -8,7 +8,7 @@ class SourceHttp(SourceArchive):
     def __init__(self, scheme, path, version=None, build=None):
         SourceArchive.__init__(self, scheme, path, version, build)
     
-    def prepare(self, toolName, toolbox, path=None):
+    def prepare(self, toolName, toolbox, path=None, check_modification=False, last_modified=None, etag=None):
         if not path:
             if self.scheme not in ["http", "https", "ftp"]:
                 print "Unsupported installation scheme: %s" % self.scheme
@@ -23,10 +23,38 @@ class SourceHttp(SourceArchive):
             ext = None
         
         try:
-            result = urllib2.urlopen(url)
+            print "Downloading %s ..." % url
+            req = urllib2.Request(url)
+            if last_modified:
+                req.add_header('If-Modified-Since', last_modified)
+            if etag:
+                req.add_header("If-None-Match", etag)
+
+            result = urllib2.urlopen(req)
         except urllib2.URLError as e:
             print "Failed to download %s - %s" % (url, e.reason)
             return False
+        except urllib2.HTTPError as httpError:
+            httpStatus = httpError.code 
+            if httpStatus == 304:
+                print "%s was not modified" % url
+                self.last_modified = last_modified
+                self.etag = etag
+                return False
+            elif httpStatus != 200:
+                print "Status code is not OK", httpStatus
+                return False
+        if check_modification:
+            self.last_modified = result.headers.get("last-modified")
+            self.etag = result.headers.get("etag")
+            
+            # even if response is 200 check if it was not modified
+            if (last_modified is not None) or (etag is not None):
+                if (last_modified is not None) and (last_modified == self.last_modified) or \
+                   (etag is not None) and (etag == self.etag):
+                    print "%s appears to be the same" % url
+                    return False
+
         if not ext:
             contentType = result.headers.get("content-type")
             #print "content-type", contentType
@@ -55,13 +83,13 @@ class SourceHttp(SourceArchive):
             return False
         result.close()
         res = SourceArchive.prepare(self, toolName, toolbox, path=downloadFileName)
-        if res:
-            os.unlink(downloadFileName)
+        #if res:
+        #    os.unlink(downloadFileName)
         return res
     
     def saveResult(self, downloadFileName, result, toolbox):
         toolbox.createDownloadsPath()
-        
+        os.unlink(downloadFileName)
         out = open(downloadFileName, "wb")
         leftToRead = int(result.headers.get("content-length", -1))
         while True:

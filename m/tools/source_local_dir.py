@@ -8,10 +8,20 @@ class SourceLocalDir(source_base.SourceBase):
     def __init__(self, scheme, path, version=None, build=None):
         source_base.SourceBase.__init__(self, scheme, path, version, build)
 
-    def prepare(self, toolName, toolbox, path=None):
+    def prepare(self, toolName, toolbox, path=None, check_modification=False, last_modified=None, etag=None):
         if not path:
             path = self.path
         self.prepareDir = path
+        if check_modification:
+            try:
+                statData = os.stat(path)
+                self.setLastModified(statData.st_mtime)
+                if (last_modified is not None) and (last_modified == self.last_modified):
+                    print "Directory %s was not modified" % path
+                    return False
+            except OSError:
+                print "OS error"
+                pass
         return True
     
     def getPreparedToolRootDir(self):

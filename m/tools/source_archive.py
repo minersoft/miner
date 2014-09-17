@@ -6,11 +6,20 @@ class SourceArchive(source_base.SourceBase):
     def __init__(self, scheme, path, version=None, build=None):
         source_base.SourceBase.__init__(self, scheme, path, version, build)
 
-    def prepare(self, toolName, toolbox, path=None):
+    def prepare(self, toolName, toolbox, path=None, check_modification=False, last_modified=None, etag=None):
         """Installs tool from the path specified.
         Returns True if tool was installed successfully"""
         if not path:
             path = self.path
+        if check_modification:
+            try:
+                statData = os.stat(path)
+                self.setLastModified(statData.st_mtime)
+                if (last_modified is not None) and (last_modified == self.last_modified):
+                    print "Directory %s was not modified" % path
+                    return False
+            except OSError:
+                pass
         if path.endswith(".tar") or path.endswith("tar.gz"):
             return self.prepareTar(path, toolName, toolbox)
         elif path.endswith(".zip"):
@@ -31,19 +40,21 @@ class SourceArchive(source_base.SourceBase):
         toolbox.createDownloadsPath()
         self.prepareDir = os.path.join(toolbox.getDownloadsPath(), "%s_extract" % toolName)
         if os.path.isdir(self.prepareDir):
-            shutil.rmtree(self.prepareDir, ignore_errors=True)
+            shutil.rmtree(self.prepareDir)
         return self.prepareDir
 
     def getPreparedToolRootDir(self):
         topFiles = os.listdir(self.prepareDir)
-        if len(topFiles)!=1:
-            print "Archive should contain single directory at the top level"
-            return None
-        srcPath = os.path.join(self.prepareDir, topFiles[0])
-        if not os.path.isdir(srcPath):
-            print "Archive doesn't contain top level directory"
-            return None
-        return srcPath
+        dir = None
+        for f in topFiles:
+            srcPath = os.path.join(self.prepareDir, f)
+            if os.path.isdir(srcPath):
+                if dir:
+                    print "Archive should contain single directory at the top level"
+                    return None
+                else:
+                    dir = srcPath
+        return dir
         
     def installFiles(self, destPath, toolbox):
         srcPath = self.getPreparedToolRootDir()
@@ -62,6 +73,7 @@ class SourceArchive(source_base.SourceBase):
             return filter(SourceArchive.isValidFileName, aZip.namelist())
         extractPath = self._initExtractPath(toolName, toolbox)
         try:
+            print "Extracting zip archive %s ..." % path 
             zip = zipfile.ZipFile(path, "r")
             zip.extractall(path=extractPath, members=files(zip))
             zip.close()
@@ -89,6 +101,7 @@ class SourceArchive(source_base.SourceBase):
         succeeded = False
         extractPath = self._initExtractPath(toolName, toolbox)
         try:
+            print "Extracting tar archive %s ..." % path 
             tar = tarfile.open(path)
             tar.extractall(path=extractPath, members=files(tar))
             tar.close()

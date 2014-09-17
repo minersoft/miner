@@ -26,6 +26,8 @@ import time
 import m.common as common
 import math
 
+from m.utilities import loadFromJson, saveToJson
+
 def floor(value, step, start=0):
     """floor(value, step, start=0): Returns the largest number smaller or equal to <value> in the steps of <step> starting from <start>"""
     rel = value - start
@@ -232,33 +234,6 @@ def saveToPickle(obj, fileName):
     except:
         print "Failed to open file:", fileName
         raise
-
-def loadFromJson(fileName):
-    """Loads python object from json file"""
-    import json
-    try:
-        handler = open(fileName, "rb")
-        try:
-            obj = json.load(handler)
-        except:
-            obj = None
-        handler.close()
-        return obj
-    except:
-        return None
-
-def saveToJson(obj, fileName):
-    """Saves python object to json file"""
-    import json
-    try:
-        handler = open(fileName, "wb")
-        try:
-            json.dump(obj, handler)
-        except:
-            print "Failed to save to file", fileName
-        handler.close()
-    except:
-        print "Failed to open file:", fileName
 
 def num2ip(num):
     """Converts local number to ipv4 string"""

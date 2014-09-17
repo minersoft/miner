@@ -1,14 +1,10 @@
 import miner_globals
-import miner_version
 import base
 import sys
 import m.common as common
 import os
 import os.path
-import subprocess
-import json
 import traceback
-import shutil
 
 def p_install_statement(p):
     r"""statement : INSTALL
@@ -131,7 +127,7 @@ UPDATE
         if l==3:
             return common.COMPLETE_FILE
         elif l==2:
-            return list(ToolBox().getKnownTools().keys())+["miner"]
+            return list(ToolBox().getInstalledTools().keys())
         else:
             return []
     

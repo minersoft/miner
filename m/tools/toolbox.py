@@ -3,6 +3,7 @@ import sys
 
 import miner_globals
 import miner_version
+from m.utilities import loadFromJson, saveToJson
 
 import tool
 
@@ -10,28 +11,33 @@ class ToolContainer:
     def __init__(self):
         self.tools = {}
         self.wasModified = True
-    def add(self, tool):
-        self.tools[tool.name] = tool
+        self.warehouses = {}
+    def add(self, name, tool):
+        self.tools[name] = tool
         self.wasModified = True
     def __contains__(self, name):
         return name in self.tools
     def get(self, name):
         return self.tools.get(name)
     def save(self, fileName):
-        from m.runtime import saveToJson
-        toolsDict = {}
+        toolList = {}
         for name, t in self.tools.iteritems():
-            toolsDict[name] = t.toolData
+            toolList[name] = t.toolData
+        warehouseList = []
+        for url, w in self.warehouses.iteritems():
+            warehouseList.append({'url': url, 'last-modified': w.get('last-modified'), 'etag': w.get('etag')})
+        jsonObj = {"tools": toolList, "warehouses": warehouseList }
         self.wasModified = False
-        return saveToJson(toolsDict, fileName)
+        return saveToJson(jsonObj, fileName)
     def load(self, fileName):
-        from m.runtime import loadFromJson
-        toolsDict = loadFromJson(fileName)
-        if not toolsDict:
+        jsonObj = loadFromJson(fileName)
+        if not jsonObj:
             return False
         self.tools = {}
-        for name, data in toolsDict.iteritems():
-            self.tools[name] = tool.Tool(name, data)
+        for name, data in jsonObj["tools"].iteritems():
+            self.tools[name] = tool.Tool(data)
+        for data in jsonObj.get("warehouses", []):
+            self.warehouses[data["url"]] = data
         self.wasModified = False
         return True
     def __getitem__(self, key):
@@ -42,9 +48,28 @@ class ToolContainer:
     def __delitem__(self, key):
         del self.tools[key]
         self.wasModified = True
-        
+    def merge(self, other):
+        cnt = 0
+        for name, tool in other.tools.iteritems():
+            if name in self.tools:
+                myTool = self.tools[name]
+                if not tool.isNewer(myTool):
+                    continue
+            self.tools[name] = tool
+            cnt += 1
+        self.wasModified = self.wasModified or (cnt>0)
     def keys(self):
         return self.tools.keys()
+    def getWarehouse(self, warehousePath):
+        w = self.warehouses.get(warehousePath)
+        if w is None:
+            w = {'url': warehousePath, 'last-modified': None, 'etag': None}
+            self.warehouses[warehousePath] = w
+            self.wasModified = True
+        return w
+    def __len__(self):
+        return len(self.tools)
+        
 
 class ToolBox(object):
     def __init__(self):
@@ -96,6 +121,7 @@ class ToolBox(object):
     def createKnownTools(self):
         self._knownTools = ToolContainer()
             # create empty known tools file
+        self._knownTools.add("miner", self.getMinerTool())
         self._knownTools.save(self.knownToolsPath)
     def getKnownTools(self):
         if self._knownTools is not None:
@@ -111,6 +137,9 @@ class ToolBox(object):
             return self._installedTools
         self._installedTools = ToolContainer()
         self._installedTools.load(self.installedToolsPath)
+        minerTool = self._installedTools.get("miner")
+        if not minerTool or not minerTool.isNewerOrSameVersion(miner_version.version) or (minerTool.build < miner_version.build):
+            self._installedTools["miner"] = self.getMinerTool()
         return self._installedTools
     
     def isLibInstalled(self, libName):
@@ -120,11 +149,14 @@ class ToolBox(object):
     def commit(self):
         if (self._installedTools is not None) and self._installedTools.wasModified:
             self._installedTools.save(self.installedToolsPath)
+        if (self._knownTools is not None) and self._knownTools.wasModified:
+            self._knownTools.save(self.knownToolsPath)
     def _createSource(self, url, version, build):
         from source_base import SourceBase
         from source_local_dir import SourceLocalDir
         from source_archive import SourceArchive
         from source_http import SourceHttp
+        from source_github import SourceGithub
         method, path = SourceBase.spliturl(url)
         if (method=="" or method=="file") and os.path.isfile(path):
             return SourceArchive("file", path, version, build)
@@ -135,6 +167,8 @@ class ToolBox(object):
             return False
         elif method in ["http", "https", "ftp"]:
             return SourceHttp(method, path, version, build)
+        elif method == "github":
+            return SourceGithub(method, path, version, build)
         else:
             print "Unsupported URL scheme: %s" % url
             return None
@@ -144,20 +178,59 @@ class ToolBox(object):
         if toolName in installedTools:
             print "Tool %s already installed" % toolName
             return False
+        t = None
         if not url:
             knownTools = self.getKnownTools()
             if toolName not in knownTools:
                 print "Unknown tool %s" % tool
                 return False
-            raise NotImplemented
+            t = knownTools[toolName]
+            while not t.checkDepndencies(self):
+                while True:
+                    userInput = raw_input("I fixed it - (R)etry / I can't fix it (A)bort: ")
+                    if not userInput:
+                        continue
+                    if userInput[0].lower() == 'a':
+                        return False
+                    elif userInput[0].lower() == 'r':
+                        break
+            url = t.url
+            version = t.version
+            build = t.build
+
         src = self._createSource(url, version, build)
         if not src:
             print "Unsupported URL scheme: %s" % url
             return False
         res = src.install(toolName, self)
         if res:
-            t = tool.createTool(toolName, "local", description="local")
-            installedTools.add(t)
+            if url:
+                # tool is installed manually - check if it includes tool description file
+                toolDescriptionFile = os.path.join(self.getToolPath(toolName), "tool-description.json")
+                if os.path.isfile(toolDescriptionFile):
+                    toolJson = loadFromJson(toolDescriptionFile)
+                    if toolJson:
+                        t = tool.Tool(toolJson)
+                        doItNow = True
+                        while doItNow and (not t.checkDepndencies(self)):
+                            while True:
+                                userInput = raw_input("I fixed it (R)etry / I can't fix it (A)bort / I will fix it (L)ater: ")
+                                if not userInput:
+                                    continue
+                                if userInput[0].lower() == 'a':
+                                    self._removeInstalledTool(toolName)
+                                    return False
+                                elif userInput[0].lower() == 'r':
+                                    break
+                                elif userInput[0].lower() == 'l':
+                                    doItNow = False
+                                    break
+                    else:
+                        print "Invalid tool-description file detected, ignored"
+                if not t:
+                    t = tool.createTool(toolName, url, description="manually installed", version=version)        
+                    
+            installedTools.add(toolName, t)
             self.commit()
         return res
     def uninstall(self, toolName):
@@ -207,8 +280,11 @@ class ToolBox(object):
             except:
                 return False
     def printKnownTools(self):
-        installedTools = self.getInstalledTools()
         knownTools = self.getKnownTools()
+        if len(knownTools) <= 1:
+            # only miner is known - try to get more tools
+            self.updateKnownTools()
+        installedTools = self.getInstalledTools()
         for toolName in sorted(set(knownTools.keys())|set(installedTools.keys())):
             if toolName in installedTools:
                 isInstalled = "installed"
@@ -218,13 +294,15 @@ class ToolBox(object):
                 isInstalled = ""
             if toolName in installedTools:
                 description = installedTools[toolName].description
+                version = installedTools[toolName].version
             else:
                 description = knownTools[toolName].description
-            print "  %-11s %-14s - %s" % (isInstalled, toolName, description)
+                version = knownTools[toolName].version
+            print "  %-11s %-14s %-6s - %s" % (isInstalled, toolName, version, description)
 
 
     def getMinerTool(self):
-        return {"path": "local", "version": miner_version.version, "build": miner_version.build }
+        return tool.Tool({"name": "miner", "path": "local", "version": miner_version.version, "build": miner_version.build, "description": "The Miner" })
     
     def isToolInstalled(self, toolName):
         installedTools = self.getInstalledTools()
@@ -235,9 +313,8 @@ class ToolBox(object):
             return True
         return False
 
-    def updateKnownTools(self):
-        pass
     def printAvailableUpdates(self):
+        self.updateKnownTools()
         installedTools = self.getInstalledTools()
         knownTools = self.getKnownTools()
         cnt = 0
@@ -247,7 +324,7 @@ class ToolBox(object):
                 knownTool = knownTools[toolName]
                 if knownTool.isNewer(installedTool):
                     installedBuildStr = ("/" + installedTool.build) if installedTool.build else ''
-                    knownBuildStr = ("/" + knownTool.build) if knownTool.build else ''
+                    knownBuildStr = ("/" + str(knownTool.build)) if knownTool.build else ''
                     print "UPDATE %-14s from %s%s to %s%s" % (toolName, installedTool.version, installedBuildStr, knownTool.version, knownBuildStr)
                     cnt += 1
         if cnt:
@@ -270,9 +347,46 @@ class ToolBox(object):
             return False
         self._updateMinerFromPath(newMinerPath)
     def _updateMinerFromPath(self, newMinerPath):
-        # os.execl
-        print sys.executable, os.path.join(newMinerPath,"miner_upgrade.py"), \
+        self.createRecoveryPath()
+        os.execl(sys.executable, os.path.join(newMinerPath,"miner_upgrade.py"), \
                  "-v", miner_version.version, "-b", str(miner_version.build), \
-                 "-d", miner_globals.minerBaseDir, "-r", self.getRecoveryPath()
+                 "-d", miner_globals.minerBaseDir, "-r", self.getRecoveryPath())
         
-        
+    def checkToolVersion(self, toolName, version):
+        installedTools = self.getInstalledTools()
+        tool = installedTools.get(toolName)
+        if not tool:
+            return False
+        if not version:
+            return True
+        return tool.isNewerOrSameVersion(version)
+    
+    def updateKnownTools(self):
+        warehousePath = miner_globals.getScriptParameter("MINER_WAREHOUSE", None)
+        if not warehousePath:
+            print "Warehouse Url is not defined"
+            return False
+        knownTools = self.getKnownTools()
+        warehouseData = knownTools.getWarehouse(warehousePath) 
+        src = self._createSource(warehousePath, version=None, build=None)
+        if not src:
+            print "Invalid warehouse path"
+            return False
+        res = src.prepare("warehouse", self, check_modification=True,
+                          last_modified=warehouseData.get('last-modified'), etag=warehouseData.get('etag'))
+        if not res:
+            return False
+        warehouseData["last-modified"] = src.last_modified
+        warehouseData["etag"] = src.etag
+        knownTools.wasModified = True
+        toolsDir = src.getPreparedToolRootDir()
+        warehouseTools = ToolContainer()
+        for toolFileName in os.listdir(toolsDir):
+            if toolFileName.endswith(".json"):
+                json = loadFromJson(os.path.join(toolsDir, toolFileName))
+                if json:
+                    warehouseTools.add(toolFileName[:-5], tool.Tool(json))
+        src.clearPrepare()
+        knownTools.merge(warehouseTools)
+        self.commit()
+        return True
