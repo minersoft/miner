@@ -585,6 +585,7 @@ def loadRegistry():
             setScriptParameter(key, str(value))
     else:
         # init with miner warehouse path and save
+        _registry = {}
         updateRegistry("MINER_WAREHOUSE", "https://api.github.com/repos/minersoft/warehouse/tarball")
 
 def updateRegistry(name, value):
