@@ -585,8 +585,7 @@ def loadRegistry():
             setScriptParameter(key, str(value))
     else:
         # init with miner warehouse path and save
-        _registry = {"MINER_WAREHOUSE": "https://api.github.com/repos/minersoft/warehouse/tarball"}
-        saveToJson(_registry, os.path.join(getToolsPath(), "registry.json"))
+        updateRegistry("MINER_WAREHOUSE", "https://api.github.com/repos/minersoft/warehouse/tarball")
 
 def updateRegistry(name, value):
     from m.utilities import saveToJson
@@ -594,5 +593,8 @@ def updateRegistry(name, value):
     if _registry is None:
         loadRegistry()
     _registry[name] = value
+    if not os.path.isdir(getToolsPath()):
+        os.makedirs(getToolsPath())
+                             
     saveToJson(_registry, os.path.join(getToolsPath(), "registry.json"))
     

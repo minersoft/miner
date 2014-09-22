@@ -89,7 +89,8 @@ class SourceHttp(SourceArchive):
     
     def saveResult(self, downloadFileName, result, toolbox):
         toolbox.createDownloadsPath()
-        os.unlink(downloadFileName)
+        if os.path.isfile(downloadFileName):
+            os.unlink(downloadFileName)
         out = open(downloadFileName, "wb")
         leftToRead = int(result.headers.get("content-length", -1))
         while True:
