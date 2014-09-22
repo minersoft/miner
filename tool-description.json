@@ -3,7 +3,7 @@
     "description": "The miner",
     "url": "github:///minersoft/miner",
     "version": "3.0.2",
-    "build": 11,
+    "build": 12,
     "last_modified": "2014-09-12 20:30:00",
     "dependencies": [],
     "external_modules": [],
