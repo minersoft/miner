@@ -1,15 +1,19 @@
-def loadFromJson(fileName):
+def loadFromJson(fileName, printErrors=False):
     """Loads python object from json file"""
     import json
     try:
         handler = open(fileName, "rb")
         try:
             obj = json.load(handler)
-        except:
+        except Exception as e:
+            if printErrors:
+                print "Failed to load json from '%s' - %s" % (fileName, str(e))
             obj = None
         handler.close()
         return obj
-    except:
+    except Exception as e:
+        if printErrors:
+            print "Failed to open '%s' - %s" % (fileName, str(e))
         return None
 
 def saveToJson(obj, fileName):

@@ -134,6 +134,9 @@ def getCompletionState():
     """
     Determine completion state according to the current readline global state
     """
+    globalState = miner_globals.getGlobalCompletionState()
+    if globalState >= 0:
+        return globalState
     line = readline.get_line_buffer()
     beginIndex = readline.get_begidx()
     endIndex = readline.get_endidx()
@@ -231,11 +234,13 @@ class FileCompleter:
                 break
         return line[position:endIndex]
     def getCompletions(self, text):
-        # This function is called once when TAB is preseed
+        # This function is called once when TAB is pressed
         text = self.calcPathFromText(text)
         completions = map(os.path.basename, glob.glob(text + self.globExp))
         self.completions = []
         fileDir = os.path.dirname(text)
+        if fileDir and not fileDir.endswith(os.path.sep):
+            fileDir += os.path.sep
         basenameText = os.path.basename(text)
         # mark all directories with slash at the end
         for f in completions:
@@ -258,9 +263,11 @@ class FileCompleter:
         else:
             # Try to find common prefix
             commonPrefix = os.path.commonprefix(completions)
+            #print "\n\ncommonPrefix", commonPrefix, "text", text, "fileDir", fileDir
             if len(os.path.join(fileDir,commonPrefix)) > len(text):
                 # add common suffix
-                substruct = 0 if not fileDir else (len(fileDir)+1)
+                substruct = len(fileDir)
+                #print "common='%s' fileDir='%s' len(text)=%d substruct=%d" % (commonPrefix, fileDir, len(text), substruct)
                 readline.insert_text(commonPrefix[len(text) - substruct:])
                 self.completions = []
             else:
@@ -378,7 +385,7 @@ def isTool(name):
 
 def getToolsList():
     try:
-        fileNames = os.listdir(miner_globals.getToolsPath())
+        fileNames = filter(lambda f: f[0].islower(), os.listdir(miner_globals.getToolsPath()))
     except:
         return []
     return filter(isTool, fileNames)

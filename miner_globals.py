@@ -598,4 +598,18 @@ def updateRegistry(name, value):
         os.makedirs(getToolsPath())
                              
     saveToJson(_registry, os.path.join(getToolsPath(), "registry.json"))
-    
+    setScriptParameter(name, str(value))
+
+_globalCompletionState = -1
+
+def setGlobalCompletionState(state):
+    global _globalCompletionState
+    _globalCompletionState = state
+
+def resetGlobalCompletionState():
+    global _globalCompletionState
+    _globalCompletionState = -1
+
+def getGlobalCompletionState():
+    global _globalCompletionState
+    return _globalCompletionState

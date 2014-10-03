@@ -13,7 +13,11 @@ def p_param_statement(p):
     isExpression = False
     isAppend = False
     isRemove = False
-    if nameValue[0] == '-':
+    isSave = False
+    if pos < 0:
+        ParamStatement.printValue(p[2])
+        return
+    elif nameValue[0] == '-':
         isRemove = True
         name = nameValue[1:].lstrip()
     elif pos<=0:
@@ -26,6 +30,9 @@ def p_param_statement(p):
         name = nameValue[:pos-1]
     elif pos>1 and nameValue[pos-1]=='+':
         isAppend = True
+        name = nameValue[:pos-1]
+    elif pos>1 and nameValue[pos-1]=='*':
+        isSave = True
         name = nameValue[:pos-1]
     else:
         name = nameValue[:pos]
@@ -43,6 +50,8 @@ def p_param_statement(p):
         ParamStatement.setValueIfNotDefined(name, value)
     elif isExpression:
         ParamStatement.setValueExpression(name, value)
+    elif isSave:
+        ParamStatement.saveValue(name, value)
     else:
         ParamStatement.setValue(name, value)
 
@@ -57,11 +66,13 @@ class ParamStatement(base.StatementBase):
 PARAM -name
 PARAM name?=value
 PARAM name+=value
+PARAM name*=value
 PARAM name:= <python-expression>
     Sets global parameter value.
     PARAM -name   - removes <name> parameter
     If '?=' form is used then value is set only if it is not already defined
        ':=' allows to specify python expression on the right side
+       '*=' updates and saves parameter as registry
 """
     COMPLETION_STATE = common.COMPLETE_FILE
 
@@ -90,6 +101,17 @@ PARAM name:= <python-expression>
             traceback.print_exc()
             raise common.ReturnFromScript
         miner_globals.setScriptParameter(id, str(res))
+    @staticmethod
+    def saveValue(id, value):
+        miner_globals.updateRegistry(id, value)
+    @staticmethod
+    def printValue(id):
+        val = miner_globals.getScriptParameter(id, None)
+        if not val:
+            print "PARAM '%s' is not defined" % id
+        else:
+            print "PARAM %s=%s" % (id, val)
+            
 
 class StatusStatement(base.StatementBase):
     NAME = "STATUS"

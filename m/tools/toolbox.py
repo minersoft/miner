@@ -174,6 +174,9 @@ class ToolBox(object):
             return None
         
     def install(self, toolName, url=None, version=None, build=None):
+        if toolName[0].isupper():
+            print "Tool name (%s) should start with lowercase letter" % toolName
+            return False
         installedTools = self.getInstalledTools()
         if toolName in installedTools:
             print "Tool %s already installed" % toolName
@@ -185,15 +188,8 @@ class ToolBox(object):
                 print "Unknown tool %s" % tool
                 return False
             t = knownTools[toolName]
-            while not t.checkDepndencies(self):
-                while True:
-                    userInput = raw_input("I fixed it - (R)etry / I can't fix it (A)bort: ")
-                    if not userInput:
-                        continue
-                    if userInput[0].lower() == 'a':
-                        return False
-                    elif userInput[0].lower() == 'r':
-                        break
+            if not t.checkDepndencies(self):
+                return False
             url = t.url
             version = t.version
             build = t.build
@@ -208,23 +204,12 @@ class ToolBox(object):
                 # tool is installed manually - check if it includes tool description file
                 toolDescriptionFile = os.path.join(self.getToolPath(toolName), "tool-description.json")
                 if os.path.isfile(toolDescriptionFile):
-                    toolJson = loadFromJson(toolDescriptionFile)
+                    toolJson = loadFromJson(toolDescriptionFile, printErrors=True)
                     if toolJson:
                         t = tool.Tool(toolJson)
-                        doItNow = True
-                        while doItNow and (not t.checkDepndencies(self)):
-                            while True:
-                                userInput = raw_input("I fixed it (R)etry / I can't fix it (A)bort / I will fix it (L)ater: ")
-                                if not userInput:
-                                    continue
-                                if userInput[0].lower() == 'a':
-                                    self._removeInstalledTool(toolName)
-                                    return False
-                                elif userInput[0].lower() == 'r':
-                                    break
-                                elif userInput[0].lower() == 'l':
-                                    doItNow = False
-                                    break
+                        if not t.checkDepndencies(self):
+                            self.uninstall(toolName)
+                            return False
                     else:
                         print "Invalid tool-description file detected, ignored"
                 if not t:

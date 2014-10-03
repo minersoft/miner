@@ -1,6 +1,8 @@
+#
+# Copyright Michael Groys, 2014
+#
 import optparse
 import sys
-import os
 import urllib2
 
 

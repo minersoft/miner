@@ -184,7 +184,9 @@ def t_files_STREAMVAR(t):
 # This token is used to specify URIs, filenames or filename patterns
 # it is active only in the <files> state (after READ and WRITE)
 def t_files_FILENAME(t):
-    r'([a-z]+:[^ \t\n\"\|\<\>]+)|([^ \t\n\"\|\<\>=}]+)'
+    r'([a-z]+:[^ \t\n\"\|\<\>]+)|([^ \t\n\"\|\<\>=}]+)|"[^"]*"'
+    if t.value.startswith('"'):
+        t.value = t.value[1:-1]
     return t
 
 def t_longSingleSTRING(t):
