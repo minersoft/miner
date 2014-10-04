@@ -26,7 +26,7 @@ def setDebugMode(debugMode):
     miner_globals.debugMode = debugMode
 
 class ParameterSubstitutor(string.Template):
-    idpattern = r"[0-9>*?]|[a-zA-Z][_a-zA-Z0-9]*|\#|\[\]"
+    idpattern = r"[0-9>*?@]|[a-zA-Z][_a-zA-Z0-9]*|\#|\[\]"
     def __init__(self, command):
         string.Template.__init__(self, command)
 

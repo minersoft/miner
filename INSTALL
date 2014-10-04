@@ -1,0 +1,67 @@
+Prerequisites
+-------------
+To install miner you need to have python 2.7 or pypy.
+Pypy is currently supported only on linux platform.
+python or pypy should appear in system path.
+
+Installation of miner
+---------------------
+To install miner just extract it in the folder of your choice
+
+Running miner
+-------------
+* linux
+  On linux platform run 'miner' script in the root folder of miner package
+* windows
+  On windows platform there is 'miner.bat' batch in the root folder of miner package
+  Alternatively you can add to the system path 'bin' folder of miner installation
+  which includes miner.bat and some other nice linux command line utilities, like curl, gzip, gunzip
+  implemented on python.
+
+Installation of Miner Tools
+----------------------------------
+There are different tools that extends miner functionality.
+For example they can provide connectors for additional data sources or data output.
+Miner Tools are installed within Miner, like following
+To get list of known tools
+>>> INSTALL
+To install specific tool
+>>> INSTALL http
+To update list of known tools
+>>> UPDATE
+To update specific tool to newest version
+>>> UPDATE http
+To update miner
+>>> UPDATE miner
+To uninstall tool
+>>> UNINSTALL http
+To use tool functionality
+>>> USE http
+
+Tool management requires internet connection
+Http proxy settings if any are taken from Internet Explorer settings on Windows or
+http_proxy environment variable on Linux.
+
+Alternatively tools may be installed from the manually downloaded tarball:
+>>> INSTALL http http.tar.gz
+
+Writing your code/script
+------------------------
+If you want to develop some python modules or miner scripts for use
+within miner just create tool that points to folder containing your work.
+>>> INSTALL mytool path/to/my/work
+>>> USE mytool
+>>> IMPORT mymodule
+>>> PRINT mymodule.func()
+
+Appendix
+--------
+* .minerrc
+  minerrc file can be used to initialize miner interactive sessions.
+  It can execute USE statements or define common aliases.
+  .minerrc file should be located in users home directory, e.g. ~/.minerrc on linux
+
+---------------------------------------------------------------
+
+Enjoy
+

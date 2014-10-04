@@ -4,10 +4,11 @@ classes and functions used by internal miner runtime engine
 """
 import re
 from m.common import *
-from miner_globals import isScriptParameterDefined, getScriptParameter
+from miner_globals import isScriptParameterDefined, getScriptParameter, minerBaseDir
 import os.path
 import os
 import operator
+import sys
 import types
 
 class Counter:
@@ -107,14 +108,19 @@ def regularFileReader(fileName, itemSelector):
     return (fileName, open(fileName, "rb"))
 
 import subprocess
+if sys.platform == "win32":
+    CLOSE_FDS = False
+else:
+    CLOSE_FDS = True
+
 class PopenFileObject(object):
     def __init__(self, args, bufsize=0, stderrToNull=False):
         if stderrToNull:
-            self.devNull = open("/dev/null", "wb")
+            self.devNull = open(os.devnull, "wb")
         else:
             self.devNull = None
         
-        self.p = subprocess.Popen(args, bufsize=bufsize,stdout=subprocess.PIPE, stderr=self.devNull, close_fds=True)
+        self.p = subprocess.Popen(args, bufsize=bufsize,stdout=subprocess.PIPE, stderr=self.devNull, close_fds=CLOSE_FDS)
     
     def read(self, size):
         return self.p.stdout.read(size)
@@ -132,8 +138,15 @@ class PopenFileObject(object):
         except:
             pass
         del self.p
-        #self.p.wait()    
-
+        #self.p.wait()
+    def __iter__(self):
+        return self
+    def next(self):
+        line = self.readline()
+        if line:
+            return line
+        else:
+            raise StopIteration()
 GLOB_CHARS_REGEX = re.compile(r'[\[\]?*]')
 def zipFileReader(zipFileName, itemSelector):
     args = ["unzip", "-p", zipFileName]
@@ -148,8 +161,12 @@ def zipFileReader(zipFileName, itemSelector):
     p = PopenFileObject(args, bufsize=1024*1024)
     return (zipFileName+":"+itemSelector, p)
     
+
 def gzFileReader(zipFileName, itemSelector):
-    args = ["gunzip", "-c", zipFileName]
+    if sys.platform == "win32":
+        args = [ sys.executable, os.path.join(minerBaseDir, "bin", "gzip_main.py"), "-d", "-c", zipFileName]
+    else:
+        args = ["gunzip", "-c", zipFileName]
     p = PopenFileObject(args, bufsize=1024*1024, stderrToNull=True)
     return (zipFileName, p)
     

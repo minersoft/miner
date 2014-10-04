@@ -25,6 +25,7 @@ from reorder import *
 from pie_command import *
 from select import *
 from sortby import *
+from tail_command import *
 from top_command import *
 
 __all__ = ['createTupleString', 'createNamedParameters', 'CommandBase', 'TypicalCommand']

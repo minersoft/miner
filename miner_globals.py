@@ -44,6 +44,7 @@ def setScriptParameters(args):
     scriptParameters["*"] = " ".join(freeArgs)
     scriptParameters["#"] = len(freeArgs)
     scriptParameters["[]"] = "["+",".join('"""'+a+'"""' for a in freeArgs)+"]"
+    scriptParameters["@"] = " ".join('"'+a+'"' for a in freeArgs)
     scriptParameters["?"] = "0"
     scriptParameters["MINER_VERSION"] = miner_version.version
     scriptParameters["MINER_HOME"] = getHomeDir()
@@ -593,7 +594,11 @@ def updateRegistry(name, value):
     global _registry
     if _registry is None:
         loadRegistry()
-    _registry[name] = value
+    if not value and (name in _registry):
+        del _registry[name]
+    else:
+        _registry[name] = value
+ 
     if not os.path.isdir(getToolsPath()):
         os.makedirs(getToolsPath())
                              
