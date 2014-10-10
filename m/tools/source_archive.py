@@ -1,33 +1,37 @@
 import source_base
 import os
 import shutil
+import m.loggers as loggers
 
 class SourceArchive(source_base.SourceBase):
     def __init__(self, scheme, path, version=None, build=None):
         source_base.SourceBase.__init__(self, scheme, path, version, build)
 
-    def prepare(self, toolName, toolbox, path=None, check_modification=False, last_modified=None, etag=None):
+    def prepare(self, toolName, toolbox, path=None, if_differs_from=None):
         """Installs tool from the path specified.
         Returns True if tool was installed successfully"""
         if not path:
             path = self.path
-        if check_modification:
+        md5sum = self.md5sum(path)
+        self.toolIdentity["md5sum"] = md5sum
+        loggers.installLog.info("Tool %s Setting toolIdentity['md5sum'] = %s from %s", toolName, md5sum, path)
+        if if_differs_from is not None:
             try:
-                statData = os.stat(path)
-                self.setLastModified(statData.st_mtime)
-                if (last_modified is not None) and (last_modified == self.last_modified):
-                    print "Directory %s was not modified" % path
+                from_md5sum = if_differs_from.get("md5sum")
+                if (from_md5sum is not None) and (from_md5sum == md5sum):
+                    print "Md5sum of archive %s was not modified" % path
+                    loggers.installLog.info("Tool %s Md5sum (%s) was not modified - not installing", toolName, md5sum)
                     return False
-            except OSError:
-                pass
+            except OSError as e:
+                print str(e)
         if path.endswith(".tar") or path.endswith("tar.gz"):
-            return self.prepareTar(path, toolName, toolbox)
+            res = self.prepareTar(path, toolName, toolbox)
         elif path.endswith(".zip"):
-            return self.prepareZip(path, toolName, toolbox)
+            res = self.prepareZip(path, toolName, toolbox)
         else:
             print "Unsupported archive format", self.path
-            return False
-
+            res = False
+        return res
     @staticmethod
     def isValidFileName(fileName):
         if fileName.startswith("/"):
@@ -51,6 +55,7 @@ class SourceArchive(source_base.SourceBase):
             if os.path.isdir(srcPath):
                 if dir:
                     print "Archive should contain single directory at the top level"
+                    loggers.installLog.warning("Archive %s doesn't contain single directory at the top level", self.prepareDir)
                     return None
                 else:
                     dir = srcPath
@@ -68,6 +73,7 @@ class SourceArchive(source_base.SourceBase):
         zip = zipfile.ZipFile(path)
         if not os.path.isfile(path):
             print "File %s doesn't exist or is not a file" % path
+            loggers.installLog.warning("Tool %s: File %s doesn't exist or is not a file", toolName, path)
             return False
         def files(aZip):
             return filter(SourceArchive.isValidFileName, aZip.namelist())
@@ -79,6 +85,7 @@ class SourceArchive(source_base.SourceBase):
             zip.close()
         except zipfile.BadZipfile as bzf:
             print "tar file extraction error occurred: %s" % str(bzf)
+            loggers.installLog.warning("zip file extraction error occurred: %s", str(bzf))
             return False
         except IOError as ioerror:
             print str(ioerror)
@@ -97,8 +104,8 @@ class SourceArchive(source_base.SourceBase):
 
         if not os.path.isfile(path):
             print "File %s doesn't exist or is not a file" % path
+            loggers.installLog.warning("Tool %s: File %s doesn't exist or is not a file", toolName, path)
             return False
-        succeeded = False
         extractPath = self._initExtractPath(toolName, toolbox)
         try:
             print "Extracting tar archive %s ..." % path 
@@ -107,6 +114,7 @@ class SourceArchive(source_base.SourceBase):
             tar.close()
         except tarfile.TarError as te:
             print "tar file extraction error occurred: %s" % str(te)
+            loggers.installLog.warning("tar file extraction error occurred: %s" , str(te))
             return False
         except IOError as ioerror:
             print str(ioerror)
@@ -115,4 +123,16 @@ class SourceArchive(source_base.SourceBase):
             print str(oserror)
             return False
         return True
-        
+    def md5sum(self, fileName):
+        import hashlib
+        fileObj = open(fileName, "rb")
+        READ_BUF_SIZE = 128*1024
+        md5Obj = hashlib.md5()
+        while True:
+            buf = fileObj.read(READ_BUF_SIZE)
+            if not buf:
+                break
+            md5Obj.update(buf)
+        digest = md5Obj.digest().encode("hex")
+        fileObj.close()
+        return digest

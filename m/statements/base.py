@@ -5,3 +5,5 @@ class StatementBase(common.HelpClass):
         pass
     def dump(self, fh):
         pass
+    def dumplog(self, log, context=""):
+        log.info("%sStatement %s", context, self.__class__.__name__)

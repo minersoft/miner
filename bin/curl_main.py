@@ -6,7 +6,7 @@ import sys
 import urllib2
 
 
-usage = "Usage: %prog [<options>] <url>"
+usage = "Usage: curl [<options>] <url>"
 parser = optparse.OptionParser(usage=usage, version="1.0", prog="curl")
 def parseOptions():
     parser.add_option("-i", "--include", dest="include_headers", action="store_true",

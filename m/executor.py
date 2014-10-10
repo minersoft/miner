@@ -20,10 +20,10 @@ import register_builtins
 import time
 
 # debug mode if enable parser and compilation log files are created
-def setDebugMode(debugMode):
-    if debugMode:
-        loggers.setDebugMode()
-    miner_globals.debugMode = debugMode
+def setDebugModes(debugModes):
+    if debugModes:
+        loggers.setDebugModes(debugModes)
+        miner_globals.debugMode = True
 
 class ParameterSubstitutor(string.Template):
     idpattern = r"[0-9>*?@]|[a-zA-Z][_a-zA-Z0-9]*|\#|\[\]"

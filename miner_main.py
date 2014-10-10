@@ -26,8 +26,10 @@ def parseOptions():
                       help="specify output path for scripts")
     parser.add_option("-f", "--file", dest="scriptFileName",
                       help="specify miner script to execute")
-    parser.add_option("-d", "--debug", dest="debug", action="store_true",
-                      help="creates parselog.txt and compile.log files containing miner logs")
+    parser.add_option("-d", dest="debugmodes", action="append_const", const="main",
+                      help="Creates miner.log file with basic logging")
+    parser.add_option("--debug", dest="debugmodes", action="append",
+                      help="allows to specify detailed logging targets")
     parser.add_option("-x", "--echo", dest="echo", action="store_true",
                       help="runs miner in echo mode where each command is printed before being executed")
     parser.add_option("--path", dest="pythonpath", action="append",
@@ -41,7 +43,7 @@ def parseOptions():
     parser.add_option("--pyreadline-log", dest="pyreadlineLog",
                       help="enables logging of pyreadline library")
     parser.add_option("--tools-path", dest="toolspath",
-                      help="specify path where to install minere tool (by default ~/miner2-tools)")
+                      help="specify path where to install minere tool (by default ~/miner-tools)")
     parser.add_option("--home-dir", dest="homedir", default="~",
                       help="specify specifies alternative home directory instead of '~'")
     parser.add_option("-q", "--quiet", dest="quiet", action="store_true",
@@ -100,8 +102,8 @@ MINERRC_FILE = os.path.join(miner_globals.getHomeDir(), ".minerrc")
 
 from m import executor
 
-if options.debug:
-    executor.setDebugMode(True)
+if options.debugmodes:
+    executor.setDebugModes(options.debugmodes)
 if options.output:
     miner_globals.setOutputFile(options.output)
 if options.scriptpath:

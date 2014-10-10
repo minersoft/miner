@@ -187,7 +187,10 @@ def pythonTarFileReader(tarFileName, itemSelector):
 def tarFileReader(tarFileName, itemSelector):
     if itemSelector:
         return (tarFileName, (pair for pair in pythonTarFileReader(tarFileName, itemSelector)))
-    args = ["tar", "-O", "-xf", tarFileName]
+    if sys.platform == "win32":
+        args = [ sys.executable, os.path.join(minerBaseDir, "bin", "tar_main.py"), "-O", "-xf", tarFileName]
+    else:
+        args = ["tar", "-O", "-xf", tarFileName]
     p = PopenFileObject(args, bufsize=1024*1024, stderrToNull=True)
     return (tarFileName, p)
     

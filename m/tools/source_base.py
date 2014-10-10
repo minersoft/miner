@@ -7,12 +7,11 @@ class SourceBase(object):
         self.version = version
         self.build = build
         self.prepareDir = None
-        self.last_modified = None
-        self.etag = None
+        self.toolIdentity = {}
     
-    def prepare(self, toolName, toolbox, path=None, check_modification=False, last_modified=None, etag=None):
+    def prepare(self, toolName, toolbox, path=None, if_differs_from=None):
         """Prepares install sources for actual installation (e.g. download, extract) Updates prepareDir.
-        if last_modified or etag are provided then skip prepare if they match installation source
+        If <if_differs_from> dictionary provided then skip prepare operation if it matches identity of installation source
         Returns true if prepare stage succeeded"""
         raise NotImplementedError()
     
@@ -51,9 +50,10 @@ class SourceBase(object):
     def setLastModified(self, t):
         import time
         if isinstance(t, basestring):
-            self.last_modified = t
+            self.toolIdentity["last-modified"] = t
         elif isinstance(t, int) or isinstance(t, float):
-            self.last_modified = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(t))
+            self.toolIdentity["last-modified"] = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(t))
         else:
             print "Trying to set invalid last modified time", t
-    
+    def getLastModified(self):
+        return self.toolIdentity.get("last-modified", "")

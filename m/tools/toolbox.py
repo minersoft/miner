@@ -4,6 +4,7 @@ import sys
 import miner_globals
 import miner_version
 from m.utilities import loadFromJson, saveToJson
+import m.loggers as loggers
 
 import tool
 
@@ -25,7 +26,7 @@ class ToolContainer:
             toolList[name] = t.toolData
         warehouseList = []
         for url, w in self.warehouses.iteritems():
-            warehouseList.append({'url': url, 'last-modified': w.get('last-modified'), 'etag': w.get('etag')})
+            warehouseList.append(dict(w.iteritems(), url=url))
         jsonObj = {"tools": toolList, "warehouses": warehouseList }
         self.wasModified = False
         return saveToJson(jsonObj, fileName)
@@ -57,7 +58,8 @@ class ToolContainer:
                     continue
             self.tools[name] = tool
             cnt += 1
-        self.wasModified = self.wasModified or (cnt>0)
+        if cnt > 0:
+            self.wasModified = True
     def keys(self):
         return self.tools.keys()
     def getWarehouse(self, warehousePath):
@@ -148,8 +150,10 @@ class ToolBox(object):
         pass
     def commit(self):
         if (self._installedTools is not None) and self._installedTools.wasModified:
+            loggers.mainLog.info("committing installed tools")
             self._installedTools.save(self.installedToolsPath)
         if (self._knownTools is not None) and self._knownTools.wasModified:
+            loggers.mainLog.info("committing known tools")
             self._knownTools.save(self.knownToolsPath)
     def _createSource(self, url, version, build):
         from source_base import SourceBase
@@ -308,7 +312,7 @@ class ToolBox(object):
             if (toolName in knownTools) and installedTool.version!='0':
                 knownTool = knownTools[toolName]
                 if knownTool.isNewer(installedTool):
-                    installedBuildStr = ("/" + installedTool.build) if installedTool.build else ''
+                    installedBuildStr = ("/" + str(installedTool.build)) if installedTool.build else ''
                     knownBuildStr = ("/" + str(knownTool.build)) if knownTool.build else ''
                     print "UPDATE %-14s from %s%s to %s%s" % (toolName, installedTool.version, installedBuildStr, knownTool.version, knownBuildStr)
                     cnt += 1
@@ -357,12 +361,11 @@ class ToolBox(object):
         if not src:
             print "Invalid warehouse path"
             return False
-        res = src.prepare("warehouse", self, check_modification=True,
-                          last_modified=warehouseData.get('last-modified'), etag=warehouseData.get('etag'))
+        res = src.prepare("warehouse", self, if_differs_from=warehouseData)
         if not res:
             return False
-        warehouseData["last-modified"] = src.last_modified
-        warehouseData["etag"] = src.etag
+        warehouseData.update(src.toolIdentity)
+        loggers.installLog.info("Warehouse data=%s", warehouseData)
         knownTools.wasModified = True
         toolsDir = src.getPreparedToolRootDir()
         warehouseTools = ToolContainer()
@@ -373,5 +376,6 @@ class ToolBox(object):
                     warehouseTools.add(toolFileName[:-5], tool.Tool(json))
         src.clearPrepare()
         knownTools.merge(warehouseTools)
+        loggers.installLog.info("UPDATE from warehouse: known tools were %s modified", "" if knownTools.wasModified else "not") 
         self.commit()
         return True

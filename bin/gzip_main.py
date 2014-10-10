@@ -62,6 +62,7 @@ def copyStream(inStream, outStream):
         outStream.write(buf)
 
 def compress(options, files):
+    ec = 0
     if not files:
         reopenFileInBinMode(sys.stdout)
         inStream = sys.stdin
@@ -71,6 +72,7 @@ def compress(options, files):
             gzipStream.close()
         except Exception as e:
             print >>sys.stderr, str(e)
+            ec = 1
     else:
         if options.ascii:
             mode = "r"
@@ -83,25 +85,31 @@ def compress(options, files):
                     deleteFile(outFileName)
                 else:
                     print >>sys.stderr, "File %s exists skipped (use -f option to force)" % outFileName
+                    ec = 1
                     continue
             try:
-                gzipStream = gzip.open(outFileName, mode="wb", compresslevel=options.compresslevel)
+                statData = os.stat(fileName)
+                gzipStream = gzip.open(outFileName, mode="wb", compresslevel=options.compresslevel, mtime=statData.st_mtime)
             except Exception as e:
                 print >>sys.stderr, str(e)
+                ec = 1
                 continue
             try:    
                 inStream = open(fileName, mode=mode)
             except Exception as e:
                 print >>sys.stderr, str(e)
+                ec = 1
             else:
                 copyStream(inStream, gzipStream)
                 inStream.close()
                 deleteFile(fileName)
+                ec = 0
             gzipStream.close()
-            
+    return ec
             
 
 def decompress(options, files):
+    ec = 0
     if options.ascii:
         mode = "r"
     else:
@@ -112,7 +120,7 @@ def decompress(options, files):
             gzipStream = gzip.open(fileobj=sys.stdin, mode="rb", compresslevel=options.compresslevel)
         except Exception as e:
             print >>sys.stderr, str(e)
-            return
+            return 1
         if not options.ascii:
             reopenFileInBinMode(sys.stdout)
         outStream = sys.stdout
@@ -134,10 +142,12 @@ def decompress(options, files):
                     gzipStream.close()
                 except Exception as e:
                     print >>sys.stderr, str(e)
+                    ec = 1
                     continue
             else:
                 if not fileName.endswith(GZ_EXTENSION):
                     print >>sys.stderr, "File %s doesn't end with %s don't know how to rename, skipped" % (fileName, GZ_EXTENSION)
+                    ec = 1
                     continue
                 outFileName = fileName[:-len(GZ_EXTENSION)]
                 if os.path.exists(outFileName):
@@ -145,26 +155,34 @@ def decompress(options, files):
                         deleteFile(outFileName)
                     else:
                         print >>sys.stderr, "File %s exists skipped (use -f option to force)" % outFileName
+                        ec = 1
                         continue
                         
                 try:
                     outStream = open(outFileName, mode=mode)
                 except Exception as e:
                     print >>sys.stderr, str(e)
+                    ec = 1
                     continue
                 try:
                     gzipStream = gzip.open(fileName, mode="rb", compresslevel=options.compresslevel)
+                    ec = 0
                 except Exception as e:
                     print >>sys.stderr, str(e)
+                    ec = 1
                 else:
                     copyStream(gzipStream, outStream)
                     gzipStream.close()
                     deleteFile(fileName)
+                    ec = 0
                 outStream.close()
+    return ec
 
 (options, files) = parseOptions()
 
 if options.decompress:
-    decompress(options, files)
+    ec = decompress(options, files)
 else:
-    compress(options, files)
+    ec = compress(options, files)
+
+sys.exit(ec)

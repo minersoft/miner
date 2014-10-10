@@ -587,7 +587,7 @@ def loadRegistry():
     else:
         # init with miner warehouse path and save
         _registry = {}
-        updateRegistry("MINER_WAREHOUSE", "https://api.github.com/repos/minersoft/warehouse/tarball")
+        updateRegistry("MINER_WAREHOUSE", "github:///minersoft/warehouse")
 
 def updateRegistry(name, value):
     from m.utilities import saveToJson

@@ -3,6 +3,7 @@ import m.common as common
 import base
 import traceback
 import sys
+import m.loggers as loggers
 
 def p_eval_statement(p):
     '''statement : EVAL expression'''
@@ -87,6 +88,11 @@ class EvalStatement(base.StatementBase):
             s += line
             s += "\n"
         print >>handle, s
+    
+    def dumplog(self, log, context=""):
+        if loggers.isEnabled(log):
+            log.info("%s\n%s", context, self.getCommand())
+
 
     def getGlobalsDict(self, **mapping):
         return dict(globals().items() + miner_globals.allVariables.items(), **mapping)
