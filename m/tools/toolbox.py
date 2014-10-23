@@ -23,7 +23,7 @@ class ToolContainer:
     def save(self, fileName):
         toolList = {}
         for name, t in self.tools.iteritems():
-            if "dont_save" not in t:
+            if "dont_save" not in t.toolData:
                 toolList[name] = t.toolData
         warehouseList = []
         for url, w in self.warehouses.iteritems():
