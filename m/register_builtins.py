@@ -2,6 +2,7 @@ import miner_globals
 import runtime
 import re
 import collections
+import os
 from data_provider import DataProvider
 from file_data_provider import FileDataProvider
 from repository_data_provider import RepositoryDataProvider
@@ -9,6 +10,7 @@ from repository_data_provider import RepositoryDataProvider
 miner_globals.addImportModule("re", value=re, resolveModule=False)
 miner_globals.addImportModule("runtime", realName="m.runtime", value=runtime, resolveModule=False)
 miner_globals.addImportModule("collections", realName="collections", value=collections, resolveModule=False)
+miner_globals.addImportModule("os", realName="os", value=os, resolveModule=False)
 
 miner_globals.addAggregator("sum", "aggregate.Sum", "sum expression evaluated for each entry")
 miner_globals.addAggregator("sumIf", "aggregate.SumIf", "sumIf(cond, exp) calculates sum of expression for which condition is True")

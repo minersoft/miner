@@ -23,7 +23,8 @@ class ToolContainer:
     def save(self, fileName):
         toolList = {}
         for name, t in self.tools.iteritems():
-            toolList[name] = t.toolData
+            if "dont_save" not in t:
+                toolList[name] = t.toolData
         warehouseList = []
         for url, w in self.warehouses.iteritems():
             warehouseList.append(dict(w.iteritems(), url=url))
@@ -139,9 +140,8 @@ class ToolBox(object):
             return self._installedTools
         self._installedTools = ToolContainer()
         self._installedTools.load(self.installedToolsPath)
-        minerTool = self._installedTools.get("miner")
-        if not minerTool or not minerTool.isNewerOrSameVersion(miner_version.version) or (minerTool.build < miner_version.build):
-            self._installedTools["miner"] = self.getMinerTool()
+        minerTool = self.getMinerTool()
+        self._installedTools["miner"] = minerTool
         return self._installedTools
     
     def isLibInstalled(self, libName):
@@ -291,7 +291,11 @@ class ToolBox(object):
 
 
     def getMinerTool(self):
-        return tool.Tool({"name": "miner", "path": "local", "version": miner_version.version, "build": miner_version.build, "description": "The Miner" })
+        minerToolJson = loadFromJson(os.path.join(miner_globals.minerBaseDir, "tool-description.json"), printErrors=True)
+        if not minerToolJson:
+            minerToolJson = {"name": "miner", "path": "local", "version": miner_version.version, "build": miner_version.build, "description": "The Miner" }
+        minerToolJson["dont_save"] = True
+        return tool.Tool(minerToolJson)
     
     def isToolInstalled(self, toolName):
         installedTools = self.getInstalledTools()
@@ -322,24 +326,40 @@ class ToolBox(object):
             print "Nothing to update"
 
     def updateMiner(self, url=None, version=None, build=None):
+        loggers.mainLog.info("Updating miner from %s", (url if url else "warehouse"))
+        if not url:
+            knownTools = self.getKnownTools()
+            t = knownTools["miner"]
+            url = t.url
+            version = t.version
+            build = t.build
         minerSrc = self._createSource(url, version, build)
         if not minerSrc:
             print "Unsupported URL scheme: %s" % url
+            loggers.mainLog.warning("Unsupported URL scheme: %s" , url)
             return False
         res = minerSrc.prepare("miner", self)
         if not res:
             print "Miner upgrade failed"
+            loggers.mainLog.warning("Miner upgrade failed")
             return False
         newMinerPath = minerSrc.getPreparedToolRootDir()
         if not newMinerPath:
             print "Miner upgrade failed - invalid miner package"
+            loggers.mainLog.warning("Miner upgrade failed - invalid miner package")
             return False
         self._updateMinerFromPath(newMinerPath)
     def _updateMinerFromPath(self, newMinerPath):
         self.createRecoveryPath()
-        os.execl(sys.executable, os.path.join(newMinerPath,"miner_upgrade.py"), \
+        args = [sys.executable, os.path.join(newMinerPath,"miner_upgrade.py"), \
                  "-v", miner_version.version, "-b", str(miner_version.build), \
-                 "-d", miner_globals.minerBaseDir, "-r", self.getRecoveryPath())
+                 "-d", miner_globals.minerBaseDir, "-r", self.getRecoveryPath()]
+        if loggers.installLogEnabled:
+            args += ["--log", loggers.getMainLogFileName()]
+        loggers.installLog.info("Executing miner upgrade via: %s", " ".join(args))
+        # call explicitly atexit functions
+        sys.exitfunc()
+        os.execv(sys.executable, args)
         
     def checkToolVersion(self, toolName, version):
         installedTools = self.getInstalledTools()

@@ -1,4 +1,5 @@
 import logging
+import os
 
 class NullLogger:
     def debug(self,msg,*args,**kwargs):
@@ -23,6 +24,8 @@ installLog = NullLogger()
 installLogEnabled = False
 completeLog = NullLogger()
 completeLogEnabled = False
+toolsLog = NullLogger()
+toolsLogEnabled = False
 
 def setDebugModes(debugModes):
     global _debugModes
@@ -38,11 +41,13 @@ def setDebugModes(debugModes):
     global installLogEnabled
     global completeLog
     global completeLogEnabled
+    global toolsLog
+    global toolsLogEnabled
 
 
     logging.basicConfig(
         level = logging.DEBUG,
-        filename = "miner.log",
+        filename = getMainLogFileName(),
         filemode = "w",
         format = "%(asctime)-15s %(filename)10s:%(lineno)4d:%(funcName)s: %(message)s"
     )
@@ -59,7 +64,6 @@ def setDebugModes(debugModes):
             parseLog = logger
             parseLogEnabled = True
         elif mode == "compile":
-            print "CCCC"
             compileLog = logger
             compileLogEnabled = True
         elif mode == "install":
@@ -68,16 +72,29 @@ def setDebugModes(debugModes):
         elif mode == "complete":
             completeLog = logger
             completeLogEnabled = True
+        elif mode == "tools":
+            toolsLog = createLog("miner-tools")
+            toolsLogEnabled = True
 
 # Special logger
 def createLog(logName):
     log = logging.getLogger(logName)
     logFh = logging.FileHandler(logName + '.log')
     logFh.setLevel(logging.INFO)
-    logFormatter = logging.Formatter('%(asctime)s: %(message)s')
+    logFormatter = logging.Formatter('%(asctime)-15s %(levelname)s:%(filename)10s:%(lineno)4d:%(funcName)s: %(message)s')
     logFh.setFormatter(logFormatter)
     log.addHandler(logFh)
     return log
 
 def isEnabled(log):
     return not isinstance(log, NullLogger)
+
+def isModeEnabled(mode):
+    return mode in _debugModes
+
+_mainLogFileName = None
+def getMainLogFileName():
+    global _mainLogFileName
+    if not _mainLogFileName:
+        _mainLogFileName = os.path.abspath("miner.log")
+    return _mainLogFileName
