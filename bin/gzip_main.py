@@ -5,8 +5,8 @@ import optparse
 import os
 import sys
 import gzip
+from bin_utils import *
 
-READ_BUF_SIZE = 128*1024
 GZ_EXTENSION = ".gz"
 
 usage = """Usage: gzip [<options>] files ... - compress files
@@ -49,18 +49,6 @@ def deleteFile(path):
     except:
         forceUnlink(path)
     
-def reopenFileInBinMode(fileobj):
-    if sys.platform == "win32":
-        import msvcrt
-        msvcrt.setmode(fileobj.fileno(), os.O_BINARY)
-    
-def copyStream(inStream, outStream):
-    while True:
-        buf = inStream.read(READ_BUF_SIZE)
-        if not buf:
-            return
-        outStream.write(buf)
-
 def compress(options, files):
     ec = 0
     if not files:

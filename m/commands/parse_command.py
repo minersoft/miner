@@ -103,7 +103,7 @@ PARSE <id> FROM <expression> [as <name>]
         else:
             parseTuple = miner_globals.getParserMapping(parserObjectName, self.myParent.getVariableNames())
             if not parseTuple:
-                raise common.CompilationError("Failed to find variable to parse '%s' out of [%s]" % (self.parserObjectName, ", ".join(self.myParent.getVariableNames())) )
+                raise common.CompilationError("Failed to find variable to parse '%s' out of [%s]" % (parserObjectName, ", ".join(self.myParent.getVariableNames())) )
             return "        %s = %s(%s)\n" % (asName, parseTuple[1], parseTuple[0])
         
     def getBody(self):

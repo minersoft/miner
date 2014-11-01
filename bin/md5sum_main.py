@@ -4,8 +4,7 @@
 import optparse
 import sys
 import hashlib
-import os
-
+from bin_utils import reopenFileInBinMode
 
 usage = "Usage: %prog [<options>] <file>..."
 parser = optparse.OptionParser(usage=usage, version="1.0", prog="md5sum")
@@ -18,11 +17,6 @@ def parseOptions():
 
     (options, files) = parser.parse_args()
     return (options, files)
-
-def reopenFileInBinMode(fileobj):
-    if sys.platform == "win32":
-        import msvcrt
-        msvcrt.setmode(fileobj.fileno(), os.O_BINARY)
 
 def md5sum(fileObj, name):
     READ_BUF_SIZE = 128*1024

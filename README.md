@@ -55,3 +55,5 @@ Miner distribution includes python implementation of following linux utilities:
 * gzip, gunzip, zcat
 * md5sum
 * tar
+* cat
+

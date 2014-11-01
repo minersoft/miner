@@ -145,11 +145,11 @@ def t_TIME(t):
 
 def t_DATE(t):
     r"\d{8}D"
-    import time
+    from calendar import timegm
     year = int(t.value[0:4])
     month = int(t.value[4:6])
     day = int(t.value[6:8])
-    val = int(time.mktime( (year, month, day, 0, 0, 0, 0, 0, 0) )) - time.timezone
+    val = timegm( (year, month, day, 0, 0, 0, 0, 0, 0) )
     t.value = str( val )
     t.type = "INTEGER"
     return t
@@ -157,7 +157,7 @@ def t_DATE(t):
 files_literals = ['|', '{']
 
 def t_files_STREAMTYPE(t):
-    r'\<[-a-zA-Z0-9]+\>'
+    r'\<[-a-zA-Z0-9_]+\>'
     t.value = t.value[1:-1]
     return t
 
@@ -176,7 +176,7 @@ def t_files_CURLY_OPEN(t):
     return t
     
 def t_files_STREAMVAR(t):
-    r"""[_a-zA-Z]\w*=([^ \t"']+|"[^"]*"|'[^']*')"""
+    r"""[_a-zA-Z]\w*=([^ \t"']+|"([^\\"]|(\\.))*"|'([^\\']|(\\.))*')"""
     equal = t.value.index('=')
     t.value = (t.value[:equal], t.value[equal+1:])
     return t
@@ -200,7 +200,7 @@ def t_longDoubleSTRING(t):
     return t
 
 def t_rSTRING(t):
-    r"""[ur]?\"([^\\"]|(\\.))*\"|r?'([^\\']|(\\.))*'"""
+    r"""[ur]?\"([^\\"]|(\\.))*\"|[ur]?'([^\\']|(\\.))*'"""
     t.type = 'STRING'
     return t
 

@@ -1,2 +1,2 @@
-version = "3.0.5"
-build=22
+version = "3.0.6"
+build=23

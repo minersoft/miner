@@ -5,6 +5,7 @@ import tarfile
 import optparse
 import sys
 import os
+from bin_utils import *
 
 usage = "Usage: %prog [cxt...] -f archive [<file>...]"
 parser = optparse.OptionParser(usage=usage, version="1.0", prog="tar")
@@ -50,19 +51,6 @@ isVerbose = False
 
 if options.verbose:
     isVerbose = True
-
-def reopenFileInBinMode(fileobj):
-    if sys.platform == "win32":
-        import msvcrt
-        msvcrt.setmode(fileobj.fileno(), os.O_BINARY)
-
-def copyStream(inStream, outStream):
-    READ_BUF_SIZE = 128*1024
-    while True:
-        buf = inStream.read(READ_BUF_SIZE)
-        if not buf:
-            return
-        outStream.write(buf)
 
 def isValidFileName(fileName):
     if fileName.startswith("/"):

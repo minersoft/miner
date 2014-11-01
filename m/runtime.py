@@ -19,14 +19,12 @@ Set of utility functions:
   class DistinctTimes(delta)
   class DistinctRanges(delta=0)
   getMyPath()
+  mergeDictionaries(*dicts)
 """
 import re
-import operator
 import time
-import m.common as common
-import math
 
-from m.utilities import loadFromJson, saveToJson
+from m.utilities import *
 
 def floor(value, step, start=0):
     """floor(value, step, start=0): Returns the largest number smaller or equal to <value> in the steps of <step> starting from <start>"""
@@ -71,6 +69,8 @@ _TIME_REXP = re.compile(r"(\d+)-(\d+)-(\d+)( (\d+):(\d+)(:(\d+))?)?")
 
 def a2gmtime(s):
     """Converts time string in format '2011-12-11 09:00:21' (time part is optional) to GMT epoch time"""
+    from calendar import timegm
+
     matches = _TIME_REXP.match(s)
     if not matches:
         return 0
@@ -86,7 +86,7 @@ def a2gmtime(s):
         tm_hour = 0
         tm_min  = 0
         tm_sec  = 0
-    return int(time.mktime( (tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, 0, 0, 0) )) - time.timezone
+    return timegm( (tm_year, tm_mon, tm_mday, tm_hour, tm_min, tm_sec, 0, 0, 0) )
 
 
 def dtime2a(dtime):
@@ -203,37 +203,6 @@ def num2h(num):
     else:
         s = "%.2fu" % (num/1e-6)
     return s
-
-def loadFromPickle(fileName):
-    """Loads python object from pickle file"""
-    import pickle
-    try:
-        handler = open(fileName, "rb")
-        try:
-            obj = pickle.load(handler)
-        except:
-            raise
-            obj = None
-        handler.close()
-        return obj
-    except:
-        raise
-        return None
-
-def saveToPickle(obj, fileName):
-    """Saves python object to pickle file"""
-    import pickle
-    try:
-        handler = open(fileName, "wb")
-        try:
-            pickle.dump(obj, handler)
-        except:
-            print "Failed to save to file", fileName
-            raise
-        handler.close()
-    except:
-        print "Failed to open file:", fileName
-        raise
 
 def num2ip(num):
     """Converts local number to ipv4 string"""

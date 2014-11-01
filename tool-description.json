@@ -2,11 +2,14 @@
     "name": "miner",
     "description": "The miner",
     "url": "github:///minersoft/miner",
-    "version": "3.0.5",
-    "build": 22,
-    "last_modified": "2014-10-23 23:30:00",
+    "version": "3.0.6",
+    "build": 23,
+    "last_modified": "2014-11-01 23:30:00",
     "dependencies": [],
     "external_modules": [],
     "external_resources": [],    
-    "changelog": []
+    "changelog": [
+        { "version": "3.0.6", "build": 23, "date": "2014-11-01 23:30:00", "description": "Support httpd_logs tool. Added unittest support. Bug fixes." },
+        { "version": "3.0.5", "build": 22, "date": "2014-10-25 23:30:00", "description": "First stable release" },      
+    ]
 }
