@@ -140,7 +140,7 @@ class ToolBox(object):
             return self._installedTools
         self._installedTools = ToolContainer()
         self._installedTools.load(self.installedToolsPath)
-        minerTool = self.getMinerTool()
+        minerTool = self.getMinerTool(dont_save=True)
         self._installedTools["miner"] = minerTool
         return self._installedTools
     
@@ -290,11 +290,12 @@ class ToolBox(object):
             print "  %-11s %-14s %-6s - %s" % (isInstalled, toolName, version, description)
 
 
-    def getMinerTool(self):
+    def getMinerTool(self, dont_save=False):
         minerToolJson = loadFromJson(os.path.join(miner_globals.minerBaseDir, "tool-description.json"), printErrors=True)
         if not minerToolJson:
             minerToolJson = {"name": "miner", "path": "local", "version": miner_version.version, "build": miner_version.build, "description": "The Miner" }
-        minerToolJson["dont_save"] = True
+        if dont_save:
+            minerToolJson["dont_save"] = True
         return tool.Tool(minerToolJson)
     
     def isToolInstalled(self, toolName):
@@ -391,7 +392,7 @@ class ToolBox(object):
         warehouseTools = ToolContainer()
         for toolFileName in os.listdir(toolsDir):
             if toolFileName.endswith(".json"):
-                json = loadFromJson(os.path.join(toolsDir, toolFileName))
+                json = loadFromJson(os.path.join(toolsDir, toolFileName), printErrors=True)
                 if json:
                     warehouseTools.add(toolFileName[:-5], tool.Tool(json))
         src.clearPrepare()

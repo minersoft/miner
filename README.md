@@ -56,4 +56,5 @@ Miner distribution includes python implementation of following linux utilities:
 * md5sum
 * tar
 * cat
+* grep
 
