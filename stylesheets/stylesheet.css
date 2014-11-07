@@ -16,6 +16,12 @@ body {
   margin: 0 auto;
 }
 
+.image{
+    background-image: url("../images/diamond.jpg");
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
 section {
   display: block;
   margin: 0 0 20px 0;
@@ -36,7 +42,7 @@ li {
 */
 
 header {
-  background: rgba(0, 0, 0, 0.1);
+  background: rgba(0, 0, 0, 0.7);
   width: 100%;
   border-bottom: 1px dashed #b5e853;
   padding: 20px 0;
