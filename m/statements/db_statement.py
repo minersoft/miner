@@ -1,0 +1,84 @@
+# 
+# Copyright Michael Groys, 2014
+#
+
+import miner_globals
+import m.db_connections
+import m.common as common
+import base
+import re
+
+ID_REXP = re.compile(r"[_a-zA-Z]\w*$")
+def p_db_connect_statement(p):
+    '''statement : DB CONNECT FILENAME streamvar_list FILENAME FILENAME'''
+    if p[5] != 'as':
+        raise common.CompilerSyntaxError(p.lexpos(5), msg="'as' expected")
+    if not ID_REXP.match(p[6]):
+        raise common.CompilerSyntaxError(p.lexpos(6), msg="identifier expected")
+
+    p[0] = DbConnect(p[3], p[4], p[6])
+    
+def p_db_close_statement(p):
+    '''statement : DB ID CLOSE'''
+    p[0] = DbClose(p[2])
+
+def p_db_execute_statement(p):
+    '''statement : DB ID EXECUTE expression'''
+    p[0] = DbExecute(p[2], p[4])
+
+class DbConnect(base.StatementBase):
+    NAME = "DB CONNECT"
+    SHORT_HELP = "DB CONNECT <db-connection-uri> [param1=value1]... as myDbConn - connects to database"
+    LONG_HELP = """DB CONNECT <db-connection-uri> [param1=value1]... as myDbConn
+    Opens new database connection"""
+    @staticmethod
+    def COMPLETION_STATE(input, pos):
+        return m.db_connections.completionState(input, pos)
+    def __init__(self, uri, streamVars, connectionId):
+        base.StatementBase.__init__(self)
+        self.uri = uri
+        self.streamVars = streamVars
+        self.connectionId = connectionId
+    def execute(self):
+        import m.db
+        conn = m.db.connect(self.uri, **self.streamVars)
+        m.db_connections.addDbConnecton(self.connectionId, conn)
+
+class DbClose(base.StatementBase):
+    NAME = "DB CLOSE"
+    SHORT_HELP = "DB CLOSE myDbConn - closes database connection"
+    LONG_HELP = """DB CLOSE myDbConn
+    Close open database connection"""
+    @staticmethod
+    def COMPLETION_STATE(input, pos):
+        return m.db_connections.completionState(input, pos)
+    def __init__(self, connectionId):
+        base.StatementBase.__init__(self)
+        self.connectionId = connectionId
+    def execute(self):
+        m.db_connections.closeDbConnection(self.connectionId)
+
+class DbExecute(base.StatementBase):
+    NAME = "DB EXECUTE"
+    SHORT_HELP = "DB myDbConn EXECUTE 'query' - closes database connection"
+    LONG_HELP = """DB myDbConn EXECUTE 'query'
+    Executes generic database query"""
+    @staticmethod
+    def COMPLETION_STATE(input, pos):
+        return m.db_connections.completionState(input, pos)
+    def __init__(self, connectionId, queryExp):
+        base.StatementBase.__init__(self)
+        self.connectionId = connectionId
+        self.queryExp = queryExp
+    def execute(self):
+        m.db_connections.checkConnection(self.connectionId)
+        miner_globals.execExpression("%s.execute(%s)" % (self.connectionId, self.queryExp.getValue()))
+
+miner_globals.addKeyWord(statement="DB")
+miner_globals.addKeyWord(keyword="CONNECT", switchesToFileMode=True)
+miner_globals.addKeyWord(keyword="CLOSE")
+miner_globals.addKeyWord(keyword="EXECUTE")
+
+miner_globals.addHelpClass(DbConnect)
+miner_globals.addHelpClass(DbClose)
+miner_globals.addHelpClass(DbExecute)

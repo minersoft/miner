@@ -50,5 +50,5 @@ class ReorderCommand(TypicalCommand):
         return globalExps + self.myExpression.getGlobalExpressions()
 
 miner_globals.addHelpClass(ReorderCommand)
-miner_globals.addCommandName("REORDER")
-
+miner_globals.addKeyWord(command="REORDER")
+miner_globals.addKeyWord(keyword="BY")

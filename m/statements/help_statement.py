@@ -53,6 +53,6 @@ class Help(base.StatementBase):
 
 
 miner_globals.addHelpClass(Help)
-miner_globals.addStatementName("HELP")
+miner_globals.addKeyWord(statement="HELP", switchesToFileMode=True)
 
 

@@ -404,7 +404,7 @@ def execute(command, verbose=True, isBatch=False, scriptFileName="stdin", lineNu
         if offset < 0:
             offset = len(command)
         startVisualOffset = int(offset/60) * 60
-        print "%sSyntax Error at:" % miner_globals.getExceptionLocation()
+        print "%s%s at:" % (miner_globals.getExceptionLocation(), err.getMsg())
         print command[startVisualOffset:startVisualOffset+60]
         print "-"*(offset-startVisualOffset) + "^"
         miner_globals.setReturnValue("-999")

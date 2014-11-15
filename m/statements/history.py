@@ -29,5 +29,5 @@ class History(base.StatementBase):
             print " %d: %s" % (index+1, s)
 
 miner_globals.addHelpClass(History)
-miner_globals.addStatementName("HISTORY")
+miner_globals.addKeyWord(statement="HISTORY")
 

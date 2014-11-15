@@ -20,7 +20,7 @@ reopenFileInBinMode(sys.stdout)
 
 openMode = "rb"
 
-for fileName in files:
+for fileName in expandFiles(files):
     if fileName == "-":
         fileObj = sys.stdin
         reopenFileInBinMode(fileObj)

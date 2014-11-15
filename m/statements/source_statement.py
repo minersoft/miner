@@ -86,10 +86,10 @@ class CallStatement(base.StatementBase):
         miner_globals.callScript(self.scriptId, inPrivateEnvironment=True, **parametersMap)
         
 miner_globals.addHelpClass(SourceStatement)
-miner_globals.addStatementName("SOURCE")
+miner_globals.addKeyWord(statement="SOURCE", switchesToFileMode=True)
 
 miner_globals.addHelpClass(OnceStatement)
-miner_globals.addStatementName("ONCE")
+miner_globals.addKeyWord(statement="ONCE", switchesToFileMode=True)
 
 miner_globals.addHelpClass(CallStatement)
-miner_globals.addStatementName("CALL")
+miner_globals.addKeyWord(statement="CALL")

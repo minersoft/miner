@@ -92,5 +92,5 @@ ACCUMULATE id [,...] BY accumulatorClass[(params)]
 
 miner_globals.addHelpClass(AccumulateCommand)
 miner_globals.addHelpClass(DefaultAccumulateCommand)
-miner_globals.addCommandName("ACCUMULATE")
-
+miner_globals.addKeyWord(command="ACCUMULATE")
+miner_globals.addKeyWord(keyword="BY")

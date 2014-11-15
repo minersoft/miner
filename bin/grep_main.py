@@ -48,7 +48,7 @@ if len(args) == 0:
 elif len(args) == 1:
     files = ["/dev/stdin"]
 else:
-    files = args[1:]
+    files = expandFiles(args[1:])
 
 pattern = args[0]
 
@@ -83,14 +83,6 @@ def dump_filename_lineno_text(filename, lineno, text):
     print "%s:%d:" % (filename, lineno), text,
 def dump_silent(filename, lineno, text):
     pass
-
-if len(sys.argv) <= 1:
-    files = ["-"]
-elif sys.argv[1] in ["-h", "--help"]:
-    print usage
-    sys.exit()
-else:
-    files = args[1:]
 
 if options.silent:
     dumpFunc = dump_silent

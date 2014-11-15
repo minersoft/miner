@@ -50,5 +50,5 @@ class ExpandCommand(SelectCommand):
         return s
 
 miner_globals.addHelpClass(ExpandCommand)
-miner_globals.addCommandName("EXPAND")
+miner_globals.addKeyWord(command="EXPAND")
 

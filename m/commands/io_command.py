@@ -15,7 +15,7 @@ import miner_globals
 from m.common import *
 import m.io_targets as io_targets
 import os
-import glob
+import sys
 import re
 from base import *
 import m.data_provider
@@ -61,9 +61,10 @@ def p_stdout_redirect(p):
     '''stdout_redirect : '>' FILENAME'''
     p[0] = p[2]
 
-def p_destination_less(p):
-    '''destination : LESS streamvar_list'''
-    p[0] = LessDestination(p[2])
+if sys.platform != "win32":
+    def p_destination_less(p):
+        '''destination : LESS streamvar_list'''
+        p[0] = LessDestination(p[2])
 
 def p_source_file_source(p):
     '''source : file_source'''
@@ -471,12 +472,14 @@ miner_globals.addHelpClass(TeeCommand)
 miner_globals.addHelpClass(StdoutDestination)
 miner_globals.addHelpClass(LessDestination)
 miner_globals.addHelpClass(StoreCommand)
-miner_globals.addCommandName("READ")
-miner_globals.addCommandName("RREAD")
-miner_globals.addCommandName("ITERATE")
-miner_globals.addCommandName("WRITE")
-miner_globals.addCommandName("TEE")
-miner_globals.addCommandName("STDOUT")
-miner_globals.addCommandName("LESS")
-miner_globals.addCommandName("STORE")
+
+miner_globals.addKeyWord(srcCommand="READ", switchesToFileMode=True)
+miner_globals.addKeyWord(srcCommand="RREAD", switchesToFileMode=True)
+miner_globals.addKeyWord(srcCommand="ITERATE")
+miner_globals.addKeyWord(srcCommand="WRITE", switchesToFileMode=True)
+miner_globals.addKeyWord(command="TEE", switchesToFileMode=True)
+miner_globals.addKeyWord(dstCommand="STDOUT", switchesToFileMode=True)
+if sys.platform != "win32":
+    miner_globals.addKeyWord(dstCommand="LESS", switchesToFileMode=True)
+miner_globals.addKeyWord(dstCommand="STORE")
 

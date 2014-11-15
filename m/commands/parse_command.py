@@ -132,5 +132,5 @@ PARSE <id> FROM <expression> [as <name>]
 # completion symbols
 ####
 miner_globals.addHelpClass(ParseCommand)
-miner_globals.addCommandName("PARSE")
-
+miner_globals.addKeyWord(command="PARSE")
+miner_globals.addKeyWord(keyword="FROM")

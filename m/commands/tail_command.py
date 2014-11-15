@@ -43,5 +43,5 @@ def %s():
     
     
 miner_globals.addHelpClass(TailCommand)
-miner_globals.addCommandName("TAIL")
+miner_globals.addKeyWord(command="TAIL")
 

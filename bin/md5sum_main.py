@@ -4,7 +4,8 @@
 import optparse
 import sys
 import hashlib
-from bin_utils import reopenFileInBinMode
+from bin_utils import reopenFileInBinMode, expandFiles
+
 
 usage = "Usage: %prog [<options>] <file>..."
 parser = optparse.OptionParser(usage=usage, version="1.0", prog="md5sum")
@@ -29,6 +30,7 @@ def md5sum(fileObj, name):
     print md5Obj.digest().encode("hex") + "\t" + name
 
 (options, files) = parseOptions()
+files = expandFiles(files)
 
 if not files:
     if options.binary:

@@ -3,6 +3,8 @@ import re
 import os.path
 import collections
 
+from m.keywords import addKeyWord
+
 # name  of logfile for pyreadline if required
 pyreadlineLogFile = None
 def setPyreadlineLog(aPyreadlineLog):
@@ -230,33 +232,7 @@ def getImportedModules():
 
 aliasCommands = {}
 
-__statementNames = set()
-
-def addStatementName(statementName):
-    __statementNames.add(statementName)
-
-def getStatementNames():
-    return list(__statementNames)
-    
-__commandNames = set()
-
-def addCommandName(commandName):
-    __commandNames.add(commandName)
-
-def getCommandNames():
-    return list(__commandNames)
-
-__privateTokenNames = set()
-
-def addPrivateTokenName(commandName):
-    __privateTokenNames.add(commandName)
-
-def getPrivateTokenNames():
-    global __privateTokenNames
-    return list(__privateTokenNames)
-
 __helpClasses = []
-
 def addHelpClass(helpClass):
     __helpClasses.append(helpClass)
 
@@ -277,6 +253,9 @@ def removeVariable(name):
         __needToUpdateCompleter = True
     except:
         print "Variable %s doesn't exist" % name
+
+def getVariable(name):
+    return allVariables[name]
 
 __importsWereModified = False
 

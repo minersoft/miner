@@ -243,6 +243,6 @@ MAP num READ[<streamtype>] <files> { commands } [REDUCE ...]
 
 miner_globals.addHelpClass(MapReduce)
 miner_globals.addHelpClass(MapReduceHelpMap)
-miner_globals.addCommandName("MAP")
-miner_globals.addCommandName("REDUCE")
+miner_globals.addKeyWord(srcCommand="MAP")
+miner_globals.addKeyWord(command="REDUCE")
 

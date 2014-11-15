@@ -42,5 +42,5 @@ class IfCommand(TypicalCommand):
 
 
 miner_globals.addHelpClass(IfCommand)
-miner_globals.addCommandName("IF")
+miner_globals.addKeyWord(command="IF")
 

@@ -1,8 +1,10 @@
+import re
+import os
+import collections
+
 import miner_globals
 import runtime
-import re
-import collections
-import os
+
 from data_provider import DataProvider
 from file_data_provider import FileDataProvider
 from repository_data_provider import RepositoryDataProvider
@@ -56,4 +58,10 @@ miner_globals.addExtensionToTargetMapping("stdout", "csv")
 
 DataProvider.registerDataProvider("file", FileDataProvider)
 DataProvider.registerDataProvider("repository", RepositoryDataProvider)
+
+import m.db
+import m.db.sqlite_engine
+sqliteEngine = m.db.sqlite_engine.SQLiteEngine()
+m.db.registerEngine("file", sqliteEngine)
+m.db.registerEngine("sqlite", sqliteEngine)
 

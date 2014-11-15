@@ -1,3 +1,5 @@
+import re
+
 def loadFromJson(fileName, printErrors=False):
     """loadFromJson(fileName, printErrors=False): Loads python object from json file"""
     import json
@@ -70,3 +72,19 @@ def mergeDictionaries(*dicts):
     for d in dicts:
         merged.update(d)
     return merged
+
+
+_backslashMatch = re.compile(r"\\([\"\\abfnrtv]|\d\d\d|x[0-9a-fA-F][0-9a-fA-F])")
+
+def decodeStr(s):
+    if s.startswith('r'):
+        s = s[1:]
+        if len(s)>=6 and (s.startswith('"""') or s.startswith("'''")):
+            return s[3:-3]
+        else:
+            return s[1:-1]
+    else:
+        if len(s)>=6 and (s.startswith('"""') or s.startswith("'''")):
+            return s[3:-3]
+        else:
+            return s[1:-1]

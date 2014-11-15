@@ -37,5 +37,5 @@ DOC <module_name.id>
 
 
 miner_globals.addHelpClass(DocStatement)
-miner_globals.addStatementName("DOC")
+miner_globals.addKeyWord(statement="DOC")
 

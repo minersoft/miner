@@ -22,3 +22,12 @@ def copyStream(inStream, outStream, bufSize = 128*1024):
     except KeyboardInterrupt:
         pass
 
+def expandFiles(files):
+    if sys.platform == "win32":
+        import glob
+        expandedFiles = []
+        for file in files:
+            expandedFiles.extend(glob.glob(file))
+        return expandedFiles
+    else:
+        return files

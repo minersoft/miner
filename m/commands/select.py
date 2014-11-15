@@ -125,8 +125,8 @@ DISTINCT '[' name = expression, ... ']' exp1 [as name1], exp2 [as name2]
 """ % self.getReturn()
 
 
-miner_globals.addCommandName("SELECT")
-miner_globals.addCommandName("DISTINCT")
+miner_globals.addKeyWord(command="SELECT")
+miner_globals.addKeyWord(command="DISTINCT")
 miner_globals.addHelpClass(SelectCommand)
 miner_globals.addHelpClass(DistinctCommand)
 

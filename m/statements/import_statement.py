@@ -46,5 +46,5 @@ IMPORT - <import-path> - removes specified import-path
 
 
 miner_globals.addHelpClass(Import)
-miner_globals.addStatementName("IMPORT")
+miner_globals.addKeyWord(statement="IMPORT")
 

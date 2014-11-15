@@ -54,5 +54,5 @@ ALIAS - <name> - removes specified alias
             pass
 
 miner_globals.addHelpClass(Alias)
-miner_globals.addStatementName("ALIAS")
+miner_globals.addKeyWord(statement="ALIAS")
 

@@ -151,8 +151,8 @@ class PrintStatement(EvalStatement):
             print miner_globals.getExceptionLocation()+str(e)
 
 miner_globals.addHelpClass(EvalStatement)
-miner_globals.addStatementName("EVAL")
+miner_globals.addKeyWord(statement="EVAL")
 miner_globals.addHelpClass(PrintStatement)
-miner_globals.addStatementName("PRINT")
+miner_globals.addKeyWord(statement="PRINT")
 
 

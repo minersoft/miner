@@ -124,8 +124,10 @@ class LimitByCommand(TypicalCommand):
         return globalExps + self.myExpression.getGlobalExpressions() +  self.myDelta.getGlobalExpressions()
 
 miner_globals.addHelpClass(LimitCommand)
-miner_globals.addCommandName("LIMIT")
+miner_globals.addKeyWord(command="LIMIT")
 
 miner_globals.addHelpClass(LimitIfCommand)
 miner_globals.addHelpClass(LimitByCommand)
 
+miner_globals.addKeyWord(keyword="IF")
+miner_globals.addKeyWord(keyword="BY")

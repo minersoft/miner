@@ -1,4 +1,5 @@
 import miner_globals
+import m.keywords
 
 #####################
 # Syntax token definitions
@@ -37,16 +38,9 @@ reserved = {
     'False' : 'FALSE',
     'None'  : 'NONE',
     'as'    : 'AS',
-    'ASC'   : 'ASC',
-    'DESC'  : 'DESC',
-    'FROM'  : 'FROM',
     'for'   : 'LC_FOR',
     'IN'    : 'UC_IN',
-    'BY'    : 'BY',
     'lambda': 'LAMBDA', 
-    'EACH'  : 'EACH',
-    'OF'    : 'OF',
-    'DEFAULT': 'DEFAULT',
     }
 
 literals = [',', '.', '+', '-', '*', '%', '/', '=', '<', '>', '?', '(', ')', '[', ']', ':', '&', '^', '@', ';', '{', '}']
@@ -207,8 +201,8 @@ def t_rSTRING(t):
 def t_ID(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
     t.type = reserved.get(t.value, 'ID')
-    if t.type in ['READ', 'RREAD', 'WRITE', 'STDOUT', 'LESS', 'SOURCE', 'HELP', 'SHELL', 'CD', 'LS', 'TEE', 'INSTALL', 'UNINSTALL', 'UPDATE']:
-        # we need to switch to the special lexing state which accepts only files
+    if m.keywords.shouldSwitchToFileMode(t.type):
+        # we need to switch to the special lexing state which tokenizes input as files
         t.lexer.begin('files')
     elif t.type == 'PARAM':
         t.lexer.begin('raw')

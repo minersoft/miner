@@ -122,7 +122,7 @@ DEL <expression> - deletes python expression
                 print "%sUnexisting key: %s" % (miner_globals.getExceptionLocation(), str(e))
 
 miner_globals.addHelpClass(Set)
-miner_globals.addStatementName("SET")
+miner_globals.addKeyWord(statement="SET")
 miner_globals.addHelpClass(DelStatement)
-miner_globals.addStatementName("DEL")
+miner_globals.addKeyWord(statement="DEL")
 

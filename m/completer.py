@@ -4,6 +4,7 @@ import os.path
 import glob
 import os
 import traceback
+import m.loggers
 
 if sys.platform.startswith("win") or miner_globals.runsUnderPypy:
     # on windows platform or under pypy
@@ -15,7 +16,7 @@ else:
 import rlcompleter
 import types
 import common
-from m.commands import SOURCE_COMMAND_NAMES, DESTINATION_COMMAND_NAMES
+from m.keywords import getStartCommands, getNextCommands
 import repository_path
 
 pythonReserved = set(["if", "else", "elif", "import", "def", "class", "try", "while", "with", "raise", "yield", "return",
@@ -188,7 +189,9 @@ def getCompletionState():
     helpClass = miner_globals.getHelpClass(command)
     theSymbolCompleter.setHelpClass(helpClass)
     if helpClass:
+        m.loggers.completeLog.info("helpClass is %s", helpClass)
         state = common.HelpClass.getCompletionState(helpClass)
+        m.loggers.completeLog.info("Completion-State is %s", state)
         if state == 100: ##common.COMPLETE_FILE:
             # check if it is complete tartget
             while position < beginIndex and line[position].isspace():
@@ -206,6 +209,7 @@ def getCompletionState():
             else:
                 input = line[start:endOfCommand]
             state = state(input, beginIndex-start)
+            m.loggers.completeLog.info("Executing of COMPLETION_STATE('%s',%d)->%s", input, beginIndex-start, state)
         return state
     else:
         return common.COMPLETE_NONE
@@ -375,8 +379,8 @@ class ImportPathCompleter:
 
 importPathCompleter = ImportPathCompleter().complete
 
-statementsForCompletion = miner_globals.getStatementNames() + SOURCE_COMMAND_NAMES
-commandsForCompletion = miner_globals.getCommandNames() + DESTINATION_COMMAND_NAMES
+statementsForCompletion = sorted(getStartCommands())
+commandsForCompletion = sorted(getNextCommands())
 helpTopicsForCompletion = statementsForCompletion + commandsForCompletion
 
 def isTool(name):

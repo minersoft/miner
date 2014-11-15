@@ -10,6 +10,7 @@
 from base import *
 from async_command import *
 from accumulate import *
+from db_command import *
 from expand import *
 from for_command import *
 from if_command import *
@@ -34,9 +35,5 @@ __all__ = ['createTupleString', 'createNamedParameters', 'CommandBase', 'Typical
 all_p_commands = filter(lambda var: var.startswith("p_"), dir())
 
 __all__ += all_p_commands
-
-SOURCE_COMMAND_NAMES = ["READ", "RREAD", "ITERATE", "MERGE", "GLUE", "MAP"]
-
-DESTINATION_COMMAND_NAMES = ["WRITE", "STDOUT", "STORE"]
 
 

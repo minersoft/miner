@@ -193,7 +193,8 @@ def %s():
         return s
     
 miner_globals.addHelpClass(MergeCommand)
-miner_globals.addCommandName("MERGE")
-
-miner_globals.addCommandName("GLUE")
 miner_globals.addHelpClass(GlueCommand)
+
+miner_globals.addKeyWord(srcCommand="MERGE")
+miner_globals.addKeyWord(srcCommand="GLUE")
+miner_globals.addKeyWord(keyword="BY")

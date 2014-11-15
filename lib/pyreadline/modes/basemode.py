@@ -283,7 +283,7 @@ class BaseMode(object):
         filename completion."""
         completions = self._get_completions()
         if completions:
-            cprefix = commonprefix(completions)
+            cprefix = commonprefix(completions, self.complete_filesystem)
             if len(cprefix) > 0:
                 rep = [ c for c in cprefix ]
                 point=self.l_buffer.point
@@ -606,14 +606,22 @@ class BaseMode(object):
         text = ensure_str(u''.join(buf[begidx:endidx]))
         return text
 
-def commonprefix(m):
+def commonprefix(m, complete_filesystem="on"):
     "Given a list of pathnames, returns the longest common leading component"
     if not m: return ''
     prefix = m[0]
-    for item in m:
-        for i in range(len(prefix)):
-            if prefix[:i+1].lower() != item[:i+1].lower():
-                prefix = prefix[:i]
-                if i == 0: return ''
-                break
+    if complete_filesystem == "on":
+        for item in m:
+            for i in range(len(prefix)):
+                if prefix[:i+1].lower() != item[:i+1].lower():
+                    prefix = prefix[:i]
+                    if i == 0: return ''
+                    break
+    else:
+        for item in m:
+            for i in range(len(prefix)):
+                if prefix[:i+1] != item[:i+1]:
+                    prefix = prefix[:i]
+                    if i == 0: return ''
+                    break
     return prefix

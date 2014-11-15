@@ -114,5 +114,5 @@ def %s():
         return globalExps
 
 miner_globals.addHelpClass(PassCommand)
-miner_globals.addCommandName("PASS")
-
+miner_globals.addKeyWord(command="PASS")
+miner_globals.addKeyWord(keyword="IF")

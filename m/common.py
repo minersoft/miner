@@ -107,10 +107,13 @@ class InvalidOutputVariables(OutputException):
         return self.msg
 
 class CompilerSyntaxError(Exception):
-    def __init__(self, offset):
+    def __init__(self, offset, msg = None):
         self.offset = offset
+        self.msg = msg
+    def getMsg(self):
+        return self.msg if self.msg else "Syntax error"
     def __str__(self):
-        return "Syntax error at position %d" % self.offset
+        return "%s at position %d" % (self.getMsg(), self.offset)
 
 class ExecutorNotification(Exception):
     """This is not exception but rather a method to notify executor about some valid user input"""

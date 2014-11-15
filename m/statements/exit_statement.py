@@ -51,7 +51,7 @@ class ReturnStatement:
         raise common.ReturnFromScript()
 
 miner_globals.addHelpClass(ExitStatement)
-miner_globals.addStatementName("EXIT")
+miner_globals.addKeyWord(statement="EXIT")
 miner_globals.addHelpClass(ReturnStatement)
-miner_globals.addStatementName("RETURN")
+miner_globals.addKeyWord(statement="RETURN")
 

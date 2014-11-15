@@ -109,9 +109,9 @@ Output:
         return [self.step.getName()] + ForSelectCommand.getVariableNames(self)
 
 miner_globals.addHelpClass(ParetoCommand)
-miner_globals.addCommandName("PARETO")
-
-
-                
+miner_globals.addKeyWord(command="PARETO")
+miner_globals.addKeyWord(keyword="SELECT")
+miner_globals.addKeyWord(keyword="BY")
+miner_globals.addKeyWord(keyword="OF")
 
 

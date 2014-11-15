@@ -43,4 +43,4 @@ def %s():
         return s
 
 miner_globals.addHelpClass(AsyncCommand)
-miner_globals.addCommandName("ASYNC")
+miner_globals.addKeyWord(command="ASYNC")

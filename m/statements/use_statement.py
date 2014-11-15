@@ -22,7 +22,7 @@ class UseStatement(base.StatementBase):
     def execute(toolName):
         miner_globals.useTool(toolName)
     
-miner_globals.addStatementName("USE")
+miner_globals.addKeyWord(statement="USE")
 miner_globals.addHelpClass(UseStatement)
 
 

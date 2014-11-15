@@ -104,5 +104,6 @@ USAGE command validates that all required script parameters were provided otherw
         raise m.common.ReturnFromScript()
 
 miner_globals.addHelpClass(Usage)
-miner_globals.addStatementName("USAGE")
+miner_globals.addKeyWord(statement="USAGE")
+miner_globals.addKeyWord(keyword="DEFAULT")
 

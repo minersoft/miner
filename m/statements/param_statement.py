@@ -127,7 +127,7 @@ class StatusStatement(base.StatementBase):
         miner_globals.setScriptParameter("?", self.value)
 
 miner_globals.addHelpClass(ParamStatement)
-miner_globals.addStatementName("PARAM")
+miner_globals.addKeyWord(statement="PARAM")
 
 miner_globals.addHelpClass(StatusStatement)
-miner_globals.addStatementName("STATUS")
+miner_globals.addKeyWord(statement="STATUS")

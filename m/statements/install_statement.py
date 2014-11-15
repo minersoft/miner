@@ -150,12 +150,12 @@ def getToolVersion(toolName):
     raise NotImplementedError()
  
 miner_globals.getToolVersion = getToolVersion     
-miner_globals.addStatementName("INSTALL")
+miner_globals.addKeyWord(statement="INSTALL")
 miner_globals.addHelpClass(InstallStatement)
 
-miner_globals.addStatementName("UNINSTALL")
+miner_globals.addKeyWord(statement="UNINSTALL")
 miner_globals.addHelpClass(UninstallStatement)
 
-miner_globals.addStatementName("UPDATE")
+miner_globals.addKeyWord(statement="UPDATE")
 miner_globals.addHelpClass(UpdateStatement)
 

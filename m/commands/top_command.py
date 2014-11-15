@@ -51,8 +51,8 @@ class BottomCommand(TopCommand):
     def __init__(self, number, exp):
         TopCommand.__init__(self, number, exp, ascending = True)
 
-miner_globals.addCommandName("TOP")
-miner_globals.addCommandName("BOTTOM")
+miner_globals.addKeyWord(command="TOP")
+miner_globals.addKeyWord(command="BOTTOM")
 miner_globals.addHelpClass(TopCommand)
 miner_globals.addHelpClass(BottomCommand)
 

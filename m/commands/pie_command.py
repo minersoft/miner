@@ -45,5 +45,5 @@ def %s():
         return self.myParent.getVariableNames() + [name]
 
 miner_globals.addHelpClass(PieCommand)
-miner_globals.addCommandName("PIE")
+miner_globals.addKeyWord(command="PIE")
 

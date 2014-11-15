@@ -73,5 +73,7 @@ def %s():
         return s
     
 miner_globals.addHelpClass(SortbyCommand)
-miner_globals.addCommandName("SORTBY")
+miner_globals.addKeyWord(command="SORTBY")
+miner_globals.addKeyWord(keyword="ASC")
+miner_globals.addKeyWord(keyword="DESC")
 

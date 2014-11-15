@@ -168,6 +168,8 @@ def decompress(options, files):
 
 (options, files) = parseOptions()
 
+files = expandFiles(files)
+
 if options.decompress:
     ec = decompress(options, files)
 else:

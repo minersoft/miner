@@ -11,6 +11,7 @@ from exp_rules import *
 
 # import definitions from all statement classes
 from m.statements.alias import *
+from m.statements.db_statement import *
 from m.statements.doc_statement import *
 from m.statements.exit_statement import *
 from m.statements.eval_statement import *
@@ -31,8 +32,9 @@ from m.commands import *
 import m.common as common
 import miner_globals
 import tokens as tokens_module
+import m.keywords
 
-for c in miner_globals.getStatementNames() + miner_globals.getCommandNames() + miner_globals.getPrivateTokenNames():
+for c in m.keywords.getAllKeyWords():
     tokens_module.reserved[c] = c
 
 tokens_module.tokens.extend(list(tokens_module.reserved.values()))

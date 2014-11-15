@@ -42,6 +42,8 @@ def parseOptions():
     return (options, files)
 
 (options, files) = parseOptions()
+files = expandFiles(files)
+
 if not options.archive:
     print >>sys.stderr, "Archive name should be specified"
     parser.print_usage(sys.stderr)

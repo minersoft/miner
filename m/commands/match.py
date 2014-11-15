@@ -50,5 +50,5 @@ class MatchCommand(TypicalCommand):
 
 
 miner_globals.addHelpClass(MatchCommand)
-miner_globals.addCommandName("MATCH")
+miner_globals.addKeyWord(command="MATCH")
 

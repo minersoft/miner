@@ -87,11 +87,11 @@ class LSStatement(base.StatementBase):
             print "Execution of ls failed:", str(e)
 
 miner_globals.addHelpClass(ShellStatement)
-miner_globals.addStatementName("SHELL")
+miner_globals.addKeyWord(statement="SHELL", switchesToFileMode=True)
 miner_globals.addHelpClass(PwdStatement)
-miner_globals.addStatementName("PWD")
+miner_globals.addKeyWord(statement="PWD")
 miner_globals.addHelpClass(CDStatement)
-miner_globals.addStatementName("CD")
+miner_globals.addKeyWord(statement="CD", switchesToFileMode=True)
 miner_globals.addHelpClass(LSStatement)
-miner_globals.addStatementName("LS")
+miner_globals.addKeyWord(statement="LS", switchesToFileMode=True)
 
