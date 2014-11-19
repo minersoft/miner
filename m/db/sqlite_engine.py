@@ -2,11 +2,10 @@
 # Copyright Michael Groys, 2014
 #
 import std_engine
-from engine_interface import EngineInterface
 
-class SQLiteEngine(EngineInterface):
+class SQLiteEngine(std_engine.Engine):
     def __init__(self):
-        EngineInterface.__init__(self)
+        std_engine.Engine.__init__(self)
     def connect(self, dbtype, parsedUrl, **kwargs):
         import sqlite3
         return std_engine.Connection(sqlite3.connect(parsedUrl), self)
