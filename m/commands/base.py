@@ -59,7 +59,11 @@ class CommandBase(GeneratorBase, HelpClass):
         Returns list of variables used in command for some minimal validation
         '''
         return []
-    
+    def getFinalizeCallback(self):
+        '''
+        May specify callback that will be executed after completion of miner operation
+        '''
+        return None
     # completion state describes state used for internal command completions
     COMPLETION_STATE = COMPLETE_SYMBOLS
     MORE_SYMBOLS_FOR_COMPLETION = []
