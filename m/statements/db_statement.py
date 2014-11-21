@@ -22,6 +22,10 @@ def p_db_close_statement(p):
     '''statement : DB ID CLOSE'''
     p[0] = DbClose(p[2])
 
+def p_db_tables_statement(p):
+    '''statement : DB ID TABLES'''
+    p[0] = DbTables(p[2])
+
 def p_db_execute_statement(p):
     '''statement : DB ID EXECUTE expression'''
     p[0] = DbExecute(p[2], p[4])
@@ -46,8 +50,8 @@ class DbConnect(base.StatementBase):
 
 class DbClose(base.StatementBase):
     NAME = "DB CLOSE"
-    SHORT_HELP = "DB CLOSE myDbConn - closes database connection"
-    LONG_HELP = """DB CLOSE myDbConn
+    SHORT_HELP = "DB myDbConn CLOSE- closes database connection"
+    LONG_HELP = """DB myDbConn CLOSE
     Close open database connection"""
     @staticmethod
     def COMPLETION_STATE(input, pos):
@@ -57,6 +61,23 @@ class DbClose(base.StatementBase):
         self.connectionId = connectionId
     def execute(self):
         m.db_connections.closeDbConnection(self.connectionId)
+
+class DbTables(base.StatementBase):
+    NAME = "DB TABLES"
+    SHORT_HELP = "DB myDbConn TABLES- lists database tables"
+    LONG_HELP = """DB myDbConn TABLES
+    Close open database connection"""
+    @staticmethod
+    def COMPLETION_STATE(input, pos):
+        return m.db_connections.completionState(input, pos)
+    def __init__(self, connectionId):
+        base.StatementBase.__init__(self)
+        self.connectionId = connectionId
+    def execute(self):
+        connection = m.db_connections.getConnection(self.connectionId)
+        tableNames = connection.getTableNames()
+        for name in tableNames:
+            print name
 
 class DbExecute(base.StatementBase):
     NAME = "DB EXECUTE"
@@ -77,6 +98,7 @@ class DbExecute(base.StatementBase):
 miner_globals.addKeyWord(statement="DB")
 miner_globals.addKeyWord(keyword="CONNECT", switchesToFileMode=True)
 miner_globals.addKeyWord(keyword="CLOSE")
+miner_globals.addKeyWord(keyword="TABLES")
 miner_globals.addKeyWord(keyword="EXECUTE")
 
 miner_globals.addHelpClass(DbConnect)

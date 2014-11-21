@@ -16,6 +16,7 @@ class FetchCursor(FetchCursorInterface):
     def next(self):
         r = self.dbcursor.fetchone()
         if not r:
+            self.dbcursor = None
             raise StopIteration
         return r
     def getColumnNames(self):
@@ -23,7 +24,9 @@ class FetchCursor(FetchCursorInterface):
     def getNumColumns(self):
         return len(self.dbcursor.description)
     def close(self):
-        del self.dbcursor
+        if self.dbcursor:
+            self.dbcursor.close()
+            self.dbcursor = None
 
 class Connection(ConnectionInterface):
     def __init__(self, dbconnection, engine):
@@ -34,11 +37,11 @@ class Connection(ConnectionInterface):
         self.connection.close()
     def commit(self):
         self.connection.commit()
-    def fetch(self, query, params=tuple()):
+    def fetch(self, query, params=None):
         dbcursor = self.connection.cursor()
         dbcursor.execute(query, params)
-        return FetchCursor(dbcursor)
-    def execute(self, query, params=tuple()):
+        return self.createFetchCursor(dbcursor)
+    def execute(self, query, params=None):
         dbcursor = self.connection.cursor()
         dbcursor.execute(query, params)
         del dbcursor
@@ -52,6 +55,13 @@ class Connection(ConnectionInterface):
         tableNames = dbcursor.fetchall()
         del dbcursor
         return [t[0] for t in tableNames]
+    def createFetchCursor(self, dbcursor, numRowsToFetchAtOnce=1):
+        '''
+        This function creates fetch cursor based on database cursor.
+        It receives number of rows to fetch at once (this is recommendation value)
+        If it is 0 - fetch all rows at once
+        '''
+        return FetchCursor(dbcursor)
         
 class Engine(EngineInterface):
     def __init__(self):

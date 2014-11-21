@@ -59,7 +59,7 @@ class CommandBase(GeneratorBase, HelpClass):
         Returns list of variables used in command for some minimal validation
         '''
         return []
-    def getFinalizeCallback(self):
+    def getFinalizeAction(self):
         '''
         May specify callback that will be executed after completion of miner operation
         '''

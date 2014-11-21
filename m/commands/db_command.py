@@ -70,6 +70,11 @@ def %s():
         yield r
 """ %   (loaderName, self.dbId, loaderName)
         return s
+    
+    def getFinalizeAction(self):
+        self.initCursor()
+        return self.cursor.close
+
 
 miner_globals.addHelpClass(DbFetch)
 miner_globals.addKeyWord(srcCommand="DB")

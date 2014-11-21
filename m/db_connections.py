@@ -51,7 +51,7 @@ def completionState(input, pos):
                 return common.COMPLETE_NONE
         else:
             if l==3:
-                return ['CLOSE', 'EXECUTE', 'FETCH']
+                return ['CLOSE', 'TABLES', 'EXECUTE', 'FETCH']
             else:
                 return common.COMPLETE_SYMBOLS
 

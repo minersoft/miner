@@ -72,7 +72,12 @@ class MiningCommand(EvalStatement):
             self.myDestination.setParent(self.mySource)
         else:
             self.myDestination.setParent(self.stack[pos-1])
+        self.finalizeActions = []
     
+    def executeFinally(self):
+        while len(self.finalizeActions):
+            self.finalizeActions.pop()()
+
     def addExportedGlobals(self, cmd, name):
         exportedGlobals = cmd.getExportedGlobals(name)
         if exportedGlobals:
@@ -87,6 +92,9 @@ class MiningCommand(EvalStatement):
         depth = 0
         s += self.mySource.createLoader("loader")
         self.addExportedGlobals(self.mySource, "loader")
+        action = self.mySource.getFinalizeAction()
+        if action:
+            self.finalizeActions.append(action)
 
         parentGenerator = self.mySource 
         generatorName = "loader"
@@ -94,10 +102,16 @@ class MiningCommand(EvalStatement):
             name = "stack%d"%depth
             s += command.createGenerator(name, generatorName)
             self.addExportedGlobals(command, name)
+            action = command.getFinalizeAction()
+            if action:
+                self.finalizeActions.append(action)
             generatorName = name
             parentGenerator = command
             depth += 1
         s += self.myDestination.createSaver("saver", generatorName)
+        action = self.myDestination.getFinalizeAction()
+        if action:
+            self.finalizeActions.append(action)
         self.addExportedGlobals(self.myDestination, "saver")
         return s
 
@@ -113,7 +127,10 @@ class MiningCommand(EvalStatement):
         startTime = time.time()
         globalsDict = self.getGlobalsDict(readRecords=0, writeRecords=0, **self.exportedGlobals)
         #print "globalsDict", globalsDict 
-        exec s in globalsDict
+        try:
+            exec s in globalsDict
+        finally:
+            self.executeFinally()
         readRecords = globalsDict['readRecords']
         writeRecords = globalsDict['writeRecords']
         endTime = time.time()
