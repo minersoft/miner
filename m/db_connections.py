@@ -16,8 +16,17 @@ def closeDbConnection(name):
     if name not in _db_connections:
         raise CompilationError( "Db connection '%s' doesn't exist" % name)
 
+    conn = getVariable(name)
+    conn.close()
     removeVariable(name)
     _db_connections.remove(name)
+
+def commitDbConnection(name):
+    if name not in _db_connections:
+        raise CompilationError( "Db connection '%s' doesn't exist" % name)
+
+    conn = getVariable(name)
+    conn.commit()
 
 def getConnection(name):
     if name not in _db_connections:
@@ -51,7 +60,7 @@ def completionState(input, pos):
                 return common.COMPLETE_NONE
         else:
             if l==3:
-                return ['CLOSE', 'TABLES', 'EXECUTE', 'FETCH']
+                return ['CLOSE', 'TABLES', 'EXECUTE', 'FETCH', "PUSH", "COMMIT"]
             else:
                 return common.COMPLETE_SYMBOLS
 

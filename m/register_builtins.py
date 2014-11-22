@@ -62,6 +62,6 @@ DataProvider.registerDataProvider("repository", RepositoryDataProvider)
 import m.db
 import m.db.sqlite_engine
 sqliteEngine = m.db.sqlite_engine.SQLiteEngine()
-m.db.registerEngine("file", sqliteEngine)
-m.db.registerEngine("sqlite", sqliteEngine)
+m.db.registerEngine("file.db", sqliteEngine)
+m.db.registerEngine("file.sqlite", sqliteEngine)
 

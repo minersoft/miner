@@ -49,6 +49,24 @@ class Connection(ConnectionInterface):
         dbcursor = self.connection.cursor()
         dbcursor.executemany(query, seq_of_params)
         del dbcursor
+    def executemany_in_batches(self, batchSize, query, seq_of_params):
+        dbcursor = self.connection.cursor()
+        paramIter = iter(seq_of_params)
+        try:
+            while True:
+                leftInBatch = batchSize
+                batchParams = []
+                try:
+                    while leftInBatch>0:
+                        batchParams.append(paramIter.next())
+                        leftInBatch -= 1
+                finally:
+                    dbcursor.executemany(query, batchParams)
+                    batchParams = []
+        except StopIteration:
+            pass
+        
+                
     def getTableNames(self):
         dbcursor = self.connection.cursor()
         dbcursor.execute(self.engine.getTableNamesQuery())

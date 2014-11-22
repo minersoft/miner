@@ -22,13 +22,17 @@ def p_db_close_statement(p):
     '''statement : DB ID CLOSE'''
     p[0] = DbClose(p[2])
 
+def p_db_commit_statement(p):
+    '''statement : DB ID COMMIT'''
+    p[0] = DbCommit(p[2])
+
 def p_db_tables_statement(p):
     '''statement : DB ID TABLES'''
     p[0] = DbTables(p[2])
 
 def p_db_execute_statement(p):
-    '''statement : DB ID EXECUTE expression'''
-    p[0] = DbExecute(p[2], p[4])
+    '''statement : DB ID EXECUTE expression optional_with_params'''
+    p[0] = DbExecute(p[2], p[4], p[5])
 
 class DbConnect(base.StatementBase):
     NAME = "DB CONNECT"
@@ -62,6 +66,20 @@ class DbClose(base.StatementBase):
     def execute(self):
         m.db_connections.closeDbConnection(self.connectionId)
 
+class DbCommit(base.StatementBase):
+    NAME = "DB COMMIT"
+    SHORT_HELP = "DB myDbConn COMMIT- commits pending transactions in db connection"
+    LONG_HELP = """DB myDbConn CLOSE
+    commits pending transactions in database connection"""
+    @staticmethod
+    def COMPLETION_STATE(input, pos):
+        return m.db_connections.completionState(input, pos)
+    def __init__(self, connectionId):
+        base.StatementBase.__init__(self)
+        self.connectionId = connectionId
+    def execute(self):
+        m.db_connections.commitDbConnection(self.connectionId)
+
 class DbTables(base.StatementBase):
     NAME = "DB TABLES"
     SHORT_HELP = "DB myDbConn TABLES- lists database tables"
@@ -87,17 +105,23 @@ class DbExecute(base.StatementBase):
     @staticmethod
     def COMPLETION_STATE(input, pos):
         return m.db_connections.completionState(input, pos)
-    def __init__(self, connectionId, queryExp):
+    def __init__(self, connectionId, queryExp, paramExpList):
         base.StatementBase.__init__(self)
         self.connectionId = connectionId
         self.queryExp = queryExp
+        self.paramExpList = paramExpList
     def execute(self):
         m.db_connections.checkConnection(self.connectionId)
-        miner_globals.execExpression("%s.execute(%s)" % (self.connectionId, self.queryExp.getValue()))
+        paramsExp = "(" + "".join((p.getValue()+", ") for p in self.paramExpList) + ")"
+        try:
+            miner_globals.execExpression("%s.execute(%s, %s)" % (self.connectionId, self.queryExp.getValue(), paramsExp))
+        except Exception as e:
+            raise common.MiningError("Execution of DB query failed: %s" % str(e))
 
 miner_globals.addKeyWord(statement="DB")
 miner_globals.addKeyWord(keyword="CONNECT", switchesToFileMode=True)
 miner_globals.addKeyWord(keyword="CLOSE")
+miner_globals.addKeyWord(keyword="COMMIT")
 miner_globals.addKeyWord(keyword="TABLES")
 miner_globals.addKeyWord(keyword="EXECUTE")
 

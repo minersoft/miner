@@ -26,6 +26,8 @@ class SQLiteEngine(std_engine.Engine):
     def __init__(self):
         std_engine.Engine.__init__(self)
     def connect(self, dbtype, parsedUrl, **kwargs):
+        if not isinstance(parsedUrl, basestring):
+            raise common.MiningError("sqlite url should be local file path or file:///... URL")
         import sqlite3
         try:
             return SQLiteConnection(sqlite3.connect(parsedUrl), self)

@@ -390,3 +390,14 @@ def p_lambda_expression(p):
     p[0] = Expression()
     p[0].setLambda(p[2], p[4])
 
+def p_optional_with_params(p):
+    '''optional_with_params : '''
+    p[0] = []
+
+def p_optional_with_params_with(p):
+    '''optional_with_params : with_params'''
+    p[0] = p[1]
+
+def p_with_params(p):
+    '''with_params : WITH not_empty_expression_list'''
+    p[0] = p[2]
