@@ -15,7 +15,7 @@
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
   })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-  ga('create', 'UA-56598117-1', 'auto');
+  ga('create', 'UA-56598117-2', 'auto');
   ga('send', 'pageview');
 
   </script>
@@ -41,9 +41,21 @@
         <h1>
 <a id="framework" class="anchor" href="#framework" aria-hidden="true"><span class="octicon octicon-link"></span></a>Framework</h1>
 
-<p>Miner introduces simple yet powerful query language for data processing (you will see some examples below).
-It also provides convenient (for some) console interface with context based autocompletion.
-Miner is written in python, allowing easy integration with proprietary data formats and extending its functionality.</p>
+<p>Miner as a framework allows to access different data sources: log files, relational and NoSQL databases or just simple csv files from the single shell.
+You can analyze data, export it or transfer from one data source to another.
+Miner can be easily extended to support new data sources or proprietary log formats.
+It provides convenient (for some) console interface with context based autocompletion. 
+
+</p>
+
+<h1>
+<a id="engine" class="anchor" href="#engine" aria-hidden="true"><span class="octicon octicon-link"></span></a>Engine</h1>
+
+<p>Miner as an engine introduces simple yet powerful query language for data processing (you will see some examples below).
+This query language alongside the data mining instructions makes use of standard python expressions and is not limited to some small function subset like SQL.
+This gives user maximum freedom and allows integration with 3rd party modules.
+
+</p>
 
 <h2>
 <a id="applications" class="anchor" href="#applications" aria-hidden="true"><span class="octicon octicon-link"></span></a>Applications</h2>
@@ -103,6 +115,7 @@ Following tools are available:</p>
 <ul>
 <li>http - parse urls and http headers</li>
 <li>httpd_logs - reads ncsa (common log format) and customized apache logs</li>
+<li>mysql - connector to mysql database</li>
 <li>excel_SX - Allows to generate excel reports (but has many dependencies)</li>
 <li>pcap - enables miner to read/write network captures</li>
 </ul>
