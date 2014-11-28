@@ -29,8 +29,8 @@
         <h2>Miner is generic engine and framework for processing and analyzing data written in python</h2>
 
         <section id="downloads">
-          <a href="https://github.com/minersoft/miner/zipball/master" class="btn">Download as .zip</a>
-          <a href="https://github.com/minersoft/miner/tarball/master" class="btn">Download as .tar.gz</a>
+          <a href="https://github.com/minersoft/miner/archive/v3.1.1.zip" class="btn">Download as .zip</a>
+          <a href="https://github.com/minersoft/miner/archive/v3.1.1.tar.gz" class="btn">Download as .tar.gz</a>
           <a href="https://github.com/minersoft/miner" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
         </section>
       </div>
@@ -91,7 +91,7 @@ It can be also used to perform simulations and tests.</p>
 /heavy_script?param=1  10000
 </code></pre>
 
-<p>You can see the total time consumed by different resources</p>
+<p>To extract number of request and total time consumed by each web resource one would execute following miner query:</p>
 
 <pre><code>READ log.csv | SELECT path.split('?',1)[0] as resource, time | FOR DISTINCT resource SELECT count(True) as numRequests, sum(time) | STDOUT
 resource       numRequests     time
@@ -101,9 +101,22 @@ resource       numRequests     time
 /login         5               5000
 </code></pre>
 
-<p>And many many others interesting facts that you can learn without writing single line of code.</p>
+<p>And many many other interesting facts that you can learn without writing single line of code.</p>
 
-<p>Miner provides the possibility to work with data without need to insert it to database or pre-process it in another way.</p>
+<p>Miner provides the possibility to analyze plain data without need to insert it to database or pre-process it in another way.
+It also allows to process data stored in databases using full power of python and generate reports in different formats.
+</p>
+
+<pre><code>DB connection FETCH 'SELECT number FROM table' | SELECT mymodule.factorial(number) as factorial | WRITE report.csv
+</code></pre>
+
+<p>Miner command above performs SQL query on database, and then applies function factorial from python module <b>mymodule</b>
+saving result to <b>report.csv</b> file.
+<p>Last example shows how to transfer data from ona database to another</p>
+<pre><code>DB con1 FETCH 'SELECT number FROM table' |
+ SELECT number, mymodule.factorial(number) as factorial |
+ DB con2 PUSH 'insert into factorials(num,fact) values(%s,%s)' WITH number, factorial
+</code></pre>
 
 <h2>
 <a id="miner-tools" class="anchor" href="#miner-tools" aria-hidden="true"><span class="octicon octicon-link"></span></a>Miner Tools</h2>
