@@ -77,7 +77,7 @@ PARSE <id> FROM <expression> [as <name>]
     automatically from the available variables) or from the FROM expression provided.
     AS can be used to give different name for extracted object
     Multiple parse directives can be defined at the same time, e.g.
-      PARSE request, l2tol4 FROM coal.flow.L2toL4ClientSyn, l2tol4 FROM coal.flow.L2toL4ClientFirstPayload as l2tol4payload 
+      PARSE url, request FROM http_request.body 
     <id> can be one of:
 """
         parserHelp = miner_globals.getParserHelp()

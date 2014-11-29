@@ -58,11 +58,8 @@ class DefaultAccumulateCommand(TypicalCommand):
     NAME = "ACCUMULATE"
     SHORT_HELP = "ACCUMULATE|<empty> - accumulates coal records"
     LONG_HELP = """ACCUMULATE
-<empty>
-    Performs context dependent accumulation, e.g.
-      Accumulates coal records according to the sysId, vaId, flowId and transactionId
-      coal record is released when decoding information becomes available
-      or accumulates frecords belonging to the same transaction
+| <empty> |
+    Performs context dependent accumulation.
 ACCUMULATE id [,...] BY accumulatorClass[(params)]
     Performs custom accumulation
 """
