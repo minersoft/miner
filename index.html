@@ -32,6 +32,7 @@
           <a href="https://github.com/minersoft/miner/archive/v3.1.1.zip" class="btn">Download as .zip</a>
           <a href="https://github.com/minersoft/miner/archive/v3.1.1.tar.gz" class="btn">Download as .tar.gz</a>
           <a href="https://github.com/minersoft/miner" class="btn btn-github"><span class="icon"></span>View on GitHub</a>
+          <a href="https://github.com/minersoft/miner/wiki" class="btn btn-github"><span class="icon"></span>wiki</a>
         </section>
       </div>
     </header>
@@ -119,18 +120,20 @@ saving result to <b>report.csv</b> file.
 </code></pre>
 
 <h2>
-<a id="miner-tools" class="anchor" href="#miner-tools" aria-hidden="true"><span class="octicon octicon-link"></span></a>Miner Tools</h2>
+<a id="miner-tools" class="anchor" href="#data-sources" aria-hidden="true"><span class="octicon octicon-link"></span></a>Supported Data Sources</h2>
 
-<p>Miner tools are python packages which extends miner by implementing connectors to new data formats and/or
-exporting other functionality.
-Following tools are available:</p>
+<p>Many data sources miner supports out of the box, other are supported by miner extensions tools.
+Following data sources are currently supported:</p>
 
 <ul>
-<li>http - parse urls and http headers</li>
-<li>httpd_logs - reads ncsa (common log format) and customized apache logs</li>
-<li>mysql - connector to mysql database</li>
-<li>excel_SX - Allows to generate excel reports (but has many dependencies)</li>
-<li>pcap - enables miner to read/write network captures</li>
+<li>plain log files, tsv</li>
+<li>csv files</li>
+<li>json files</li>
+<li>excel files for reports generation</li>
+<li>ncsa (common log format) and customized apache logs</li>
+<li>sqlite database files</li>
+<li>mysql database</li>
+<li>pcap - network captures</li>
 </ul>
 
 <h2>
