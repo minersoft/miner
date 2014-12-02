@@ -32,14 +32,25 @@ def parseOptions():
                       help="Reads file in binary mode")
     parser.add_option("-v", "--invert-match", dest="invert", action="store_true",
                       help="Invert the sense of matching, to select non-matching lines.")
+    parser.add_option("--include", dest="include_pattern",
+                      help="Recurse in directories only searching file matching PATTERN.")
+    parser.add_option("--exclude", dest="exclude_pattern",
+                      help="Recurse in directories skip file matching PATTERN.")
 
     (options, args) = parser.parse_args()
     return (options, args)
 
 (options, args) = parseOptions()
 
-if options.recursive:
-    print >>sys.stderr, "Recursive mode is not supported yet"
+def getRecursive(files):
+    import fnmatch
+    filesOut = []
+    for file in files:
+        if os.path.isfile(file):
+            filesOut.append(file)
+        else:
+            filesOut.extend(getTreeFiles(file, options.include_pattern, options.exclude_pattern))
+    return filesOut
 
 if len(args) == 0:
     parser.print_usage(sys.stderr)
@@ -49,6 +60,9 @@ elif len(args) == 1:
     files = ["/dev/stdin"]
 else:
     files = expandFiles(args[1:])
+
+if options.recursive:
+    files = getRecursive(files)
 
 pattern = args[0]
 
@@ -86,7 +100,7 @@ def dump_silent(filename, lineno, text):
 
 if options.silent:
     dumpFunc = dump_silent
-elif len(files) == 1:
+elif len(files) == 1 and not options.recursive:
     if options.with_filename:
         if options.lineno:
             dumpFunc = dump_filename_lineno_text
