@@ -232,6 +232,12 @@ hr {
   background: url("../images/blacktocat.png") 0 0 no-repeat;
 }
 
+/* Icon by http://www.icons-land.com/ */
+.btn-wiki .icon {
+  opacity: 1;
+  background: url("../images/book-icon2.png") 0 0 no-repeat;
+}
+
 /* Links
    a, a:hover, a:visited
 */
