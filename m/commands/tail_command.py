@@ -6,7 +6,7 @@ import miner_globals
 from base import *
 from m.common import COMPLETE_NONE
 
-def p_command_sortby_command(p):
+def p_command_tail_command(p):
     '''command : TAIL integer'''
     p[0] = TailCommand(p[2])
 

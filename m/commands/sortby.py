@@ -21,8 +21,8 @@ class SortbyCommand(CommandBase):
     NAME = "SORTBY"
     SHORT_HELP = "SORTBY expression [,...] [ASC|DESC] - sorts records by expression"
     LONG_HELP = """SORTBY expression [,...] [ASC|DESC]
-    Sorts recors according to the expression. Default order is ascending. 
-    As usual algorith is O(N) in space and O(N*logN) in time
+    Sorts records according to the expression. Default order is ascending. 
+    As usual algorithm is O(N) in space and O(N*logN) in time
     Although it is stable meaning that the order of records with the same key remains unchanged
 """
     MORE_SYMBOLS_FOR_COMPLETION = ['ASC', 'DESC']
