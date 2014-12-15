@@ -476,7 +476,7 @@ miner_globals.addHelpClass(StoreCommand)
 miner_globals.addKeyWord(srcCommand="READ", switchesToFileMode=True)
 miner_globals.addKeyWord(srcCommand="RREAD", switchesToFileMode=True)
 miner_globals.addKeyWord(srcCommand="ITERATE")
-miner_globals.addKeyWord(srcCommand="WRITE", switchesToFileMode=True)
+miner_globals.addKeyWord(dstCommand="WRITE", switchesToFileMode=True)
 miner_globals.addKeyWord(command="TEE", switchesToFileMode=True)
 miner_globals.addKeyWord(dstCommand="STDOUT", switchesToFileMode=True)
 if sys.platform != "win32":

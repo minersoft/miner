@@ -1,3 +1,4 @@
+import sys
 import miner_globals
 import m.keywords
 
@@ -163,12 +164,13 @@ def t_files_PIPE(t):
     t.value = "|"
     return t
 
-def t_files_CURLY_OPEN(t):
-    r'\{'
-    t.lexer.begin('INITIAL')
-    t.type = "CURLY_OPEN"
-    t.value = "{"
-    return t
+if sys.platform != "win32":
+    def t_files_CURLY_OPEN(t):
+        r'\{'
+        t.lexer.begin('INITIAL')
+        t.type = "CURLY_OPEN"
+        t.value = "{"
+        return t
     
 def t_files_STREAMVAR(t):
     r"""[_a-zA-Z]\w*=([^ \t"']+|"([^\\"]|(\\.))*"|'([^\\']|(\\.))*')"""

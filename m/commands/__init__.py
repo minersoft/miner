@@ -7,6 +7,8 @@
 # Each command is responsible to create code text for its generator function
 #
 
+import sys
+
 from base import *
 from async_command import *
 from accumulate import *
@@ -17,7 +19,8 @@ from if_command import *
 from io_command import *
 from limit_command import *
 from match import *
-from map_reduce import *
+if sys.platform != "win32":
+    from map_reduce import *
 from merge_command import *
 from parse_command import *
 from pareto import *
