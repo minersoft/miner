@@ -12,7 +12,7 @@ if in_ironpython:
         success = True
     except ImportError as x:
         raise
-elif sys.platform.startswith('linux'):
+elif sys.platform.startswith('linux') or sys.platform=='darwin':
     try:
         from .ansi_keysyms import *
         success = True

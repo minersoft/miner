@@ -7,7 +7,7 @@ if in_ironpython:
         from .ironpython_clipboard import GetClipboardText, SetClipboardText
     except ImportError:
         from .no_clipboard import GetClipboardText, SetClipboardText
-elif sys.platform.startswith('linux'):
+elif sys.platform.startswith('linux') or sys.platform=='darwin':
     try:
         from .no_clipboard import *
     except ImportError, x:

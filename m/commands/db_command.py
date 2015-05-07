@@ -37,7 +37,7 @@ class DbFetch(CommandBase):
         if self.cursor:
             return
         m.db_connections.checkConnection(self.dbId)
-        paramsExp = "(" + "".join((p.getValue()+", ") for p in self.paramExpList) + ")"
+        paramsExp = ", ".join(p.getValue() for p in self.paramExpList)
         try:
             self.cursor = miner_globals.evalExpression("%s.fetch(%s, %s)" % (self.dbId, self.queryExp.getValue(), paramsExp))
         except Exception as e:
@@ -110,7 +110,7 @@ def %s():
         writeRecords += 1
         return _params
     
-    %s.executemany(%s, (getparams(r) for r in %s()))
+    %s.push(%s, (getparams(r) for r in %s()))
     %s.commit()
 """ %   (saverName, self.dbId, createTupleString(self.myParent.getVariableNames()), paramsExpTuple,
          self.dbId, self.queryExp.getValue(), generatorName, self.dbId)

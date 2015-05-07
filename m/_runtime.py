@@ -149,7 +149,10 @@ class PopenFileObject(object):
             raise StopIteration()
 GLOB_CHARS_REGEX = re.compile(r'[\[\]?*]')
 def zipFileReader(zipFileName, itemSelector):
-    args = ["unzip", "-p", zipFileName]
+    if sys.platform == "win32":
+        args = [ sys.executable, os.path.join(minerBaseDir, "bin", "unzip_main.py"), "-p", zipFileName]
+    else:
+        args = ["unzip", "-p", zipFileName]
     if itemSelector:
         if GLOB_CHARS_REGEX.search(itemSelector):
             if "/" in itemSelector:

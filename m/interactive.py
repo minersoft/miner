@@ -23,8 +23,9 @@ import signal
 pathToScript = os.path.dirname(sys.argv[0])
 historyFileName = miner_globals.getHistoryFile()
 
-if sys.platform.startswith("win") or miner_globals.runsUnderPypy:
-    # on windows platform or under pypy
+#if sys.platform.startswith("win") or miner_globals.runsUnderPypy:
+if True:
+    # always use pyreadline
     import readline_replacement as readline
     sys.modules['readline'] = readline
     import pyreadline.rlmain
@@ -39,7 +40,7 @@ else:
 
 readline.parse_and_bind("tab: complete")
 
-if sys.platform.startswith('linux'):
+if sys.platform.startswith('linux') or sys.platform=='darwin':
     def interactiveSIGHUP(signum, frame):
         sys.exit(0)
 

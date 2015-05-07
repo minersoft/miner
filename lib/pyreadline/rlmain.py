@@ -66,7 +66,7 @@ class BaseReadline(object):
         log("\n".join(self.mode.rl_settings_to_string()))
 
         self.callback = None
-        if sys.platform.startswith('linux'):
+        if sys.platform.startswith('linux') or sys.platform=='darwin':
             self.should_reserve_one_line_for_asian_ime = False
         else:
             self.should_reserve_one_line_for_asian_ime = True

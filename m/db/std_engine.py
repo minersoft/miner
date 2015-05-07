@@ -7,6 +7,8 @@ This module implements connection and FetchCursor for DB API2 compatible engines
 """
 
 from engine_interface import *
+from m.common import CompilationError
+from m.loggers import toolsLog
 
 class FetchCursor(FetchCursorInterface):
     def __init__(self, dbcursor):
@@ -29,26 +31,53 @@ class FetchCursor(FetchCursorInterface):
             self.dbcursor = None
 
 class Connection(ConnectionInterface):
-    def __init__(self, dbconnection, engine):
+    def __init__(self, dbconnection, engine, env):
         ConnectionInterface.__init__(self)
         self.connection = dbconnection
         self.engine = engine
+        self.env = env
+    def getPushBatchSize(self, queryEnv):
+        batchSize = queryEnv.get('batchSize')
+        if batchSize is None:
+            batchSize = self.env.get('pushBatchSize', 0)
+        try:
+            batchSize = int(batchSize)
+        except:
+            raise CompilationError("query batchSize should be integer")
+        return batchSize
+    def getFetchBatchSize(self, queryEnv):
+        batchSize = queryEnv.get('batchSize')
+        if batchSize is None:
+            batchSize = self.env.get('fetchBatchSize', 0)
+        try:
+            batchSize = int(batchSize)
+        except:
+            raise CompilationError("query batchSize should be integer")
+        return batchSize
     def close(self):
         self.connection.close()
     def commit(self):
         self.connection.commit()
-    def fetch(self, query, params=None):
+    def fetch(self, query, *params, **env):
+        batchSize = self.getFetchBatchSize(env)
+        if batchSize > 0:
+            toolsLog.info("Running fetch query with batchSize=%d", batchSize)
+        dbcursor = self.connection.cursor()
+        dbcursor.execute(query, tuple(params))
+        return self.createFetchCursor(dbcursor, batchSize)
+    def execute(self, query, *params, **env):
         dbcursor = self.connection.cursor()
         dbcursor.execute(query, params)
-        return self.createFetchCursor(dbcursor)
-    def execute(self, query, params=None):
-        dbcursor = self.connection.cursor()
-        dbcursor.execute(query, params)
-        del dbcursor
-    def executemany(self, query, seq_of_params):
+        dbcursor.close()
+    def push(self, query, seq_of_params, **env):
+        batchSize = self.getPushBatchSize(env)
+        if batchSize > 0:
+            toolsLog.info("Running push query with batchSize=%d", batchSize)
+            self.executemany_in_batches(batchSize, query, seq_of_params)
+            return
         dbcursor = self.connection.cursor()
         dbcursor.executemany(query, seq_of_params)
-        del dbcursor
+        dbcursor.close()
     def executemany_in_batches(self, batchSize, query, seq_of_params):
         dbcursor = self.connection.cursor()
         paramIter = iter(seq_of_params)
@@ -61,11 +90,12 @@ class Connection(ConnectionInterface):
                         batchParams.append(paramIter.next())
                         leftInBatch -= 1
                 finally:
-                    dbcursor.executemany(query, batchParams)
-                    batchParams = []
+                    if batchParams:
+                        dbcursor.executemany(query, batchParams)
+                        batchParams = []
         except StopIteration:
             pass
-        
+        dbcursor.close()
                 
     def getTableNames(self):
         dbcursor = self.connection.cursor()

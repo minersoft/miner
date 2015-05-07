@@ -470,7 +470,8 @@ miner_globals.addHelpClass(IteratorStream)
 miner_globals.addHelpClass(Destination)
 miner_globals.addHelpClass(TeeCommand)
 miner_globals.addHelpClass(StdoutDestination)
-miner_globals.addHelpClass(LessDestination)
+if sys.platform != "win32":
+    miner_globals.addHelpClass(LessDestination)
 miner_globals.addHelpClass(StoreCommand)
 
 miner_globals.addKeyWord(srcCommand="READ", switchesToFileMode=True)

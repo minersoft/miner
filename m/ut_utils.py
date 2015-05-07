@@ -98,8 +98,8 @@ def test():
     
     EXPECT_FALSE("y")
     
-    EXPECT_EQ("True", "y", msg="y should be True")
+    EXPECT_EQ(True, "y", msg="y should be True")
     
-    ASSERT_EQ("False", "y")
+    ASSERT_EQ(False, "y")
     END_TEST()
     
