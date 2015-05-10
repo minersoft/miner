@@ -21,9 +21,11 @@ tokens = [
     'OR_EQUAL',
     'RAWSTRING',
     'PIPE',
-    'CURLY_OPEN',
     ]
 
+if sys.platform != "win32":
+    tokens.append('CURLY_OPEN') # used by MMAP command
+    
 states = (
     ('files', 'inclusive'),
     ('raw', 'inclusive'),
