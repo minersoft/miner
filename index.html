@@ -104,8 +104,14 @@ resource       numRequests     time
 
 <p>And many many other interesting facts that you can learn without writing single line of code.</p>
 
+<p>You can easily export the data to excel file by running: </p>
+<pre><code>USE excel_xlsxw
+READ log.csv | ... | WRITE export.xlsx</code></pre>
+<p>Even adding charts</p>
+<pre><code>READ log.csv | ... | WRITE chartType="column" chartX="numRequests" chartY="numRequests" export.xlsx</code></pre>
+
 <p>Miner provides the possibility to analyze plain data without need to insert it to database or pre-process it in another way.
-It also allows to process data stored in databases using full power of python and generate reports in different formats.
+But it also allows to process data stored in databases using full power of python and generate reports in different formats.
 </p>
 
 <pre><code>DB connection FETCH 'SELECT number FROM table' | SELECT mymodule.factorial(number) as factorial | WRITE report.csv
@@ -113,7 +119,7 @@ It also allows to process data stored in databases using full power of python an
 
 <p>Miner command above performs SQL query on database, and then applies function factorial from python module <b>mymodule</b>
 saving result to <b>report.csv</b> file.
-<p>Last example shows how to transfer data from ona database to another</p>
+<p>Example below shows how to transfer data from ona database to another</p>
 <pre><code>DB con1 FETCH 'SELECT number FROM table' |
  SELECT number, mymodule.factorial(number) as factorial |
  DB con2 PUSH 'insert into factorials(num,fact) values(%s,%s)' WITH number, factorial
@@ -143,18 +149,8 @@ Following are currently supported:</p>
 There are different options to get them running on windows platform, for example via cygwin framework.
 We chose a different option by implementing some of them in pure python for needs of Miner, our needs and for your pleasure.
 The python port has large advantage over other implementations: it has single dependency - python interpreter.
-Following utilities are currently available:</p>
+Visit <a href="http://www.gnupy.ga">GnuPy</a>  home page for more details and download</p>
 
-<ul>
-<li>curl</li>
-<li>gzip, gunzip, zcat</li>
-<li>zip, unzip</li>
-<li>md5sum</li>
-<li>tar</li>
-<li>cat</li>
-<li>grep</li>
-</ul>
-<a href="http://api.minersoft.org/download/tools/v1/gnupy/latest" class="btn">Download zip</a>
 
       <hr/>
       <p>
