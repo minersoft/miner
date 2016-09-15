@@ -22,7 +22,10 @@ class DbFetch(CommandBase):
     SHORT_HELP = "DB <db-connection> FETCH 'query' - Gets mining data from result of database query"
     LONG_HELP = """DB <db-connection> FETCH 'query'
     Gets mining data from result of database query, e.g.
-       DB conn FETCH 'SELECT * FROM table' """
+       DB conn FETCH 'SELECT * FROM table'
+    Supports optional parameters:
+       DB conn FETCH 'SELECT * FROM table WHERE a>?' WITH threshold
+	"""
     @staticmethod
     def COMPLETION_STATE(input, pos):
         return m.db_connections.completionState(input, pos)
@@ -117,6 +120,7 @@ def %s():
         return s
 
 miner_globals.addHelpClass(DbFetch)
+miner_globals.addHelpClass(DbPush)
 miner_globals.addKeyWord(srcCommand="DB")
 miner_globals.addKeyWord(keyword="FETCH")
 miner_globals.addKeyWord(dstCommand="DB")

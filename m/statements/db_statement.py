@@ -69,7 +69,7 @@ class DbClose(base.StatementBase):
 class DbCommit(base.StatementBase):
     NAME = "DB COMMIT"
     SHORT_HELP = "DB myDbConn COMMIT- commits pending transactions in db connection"
-    LONG_HELP = """DB myDbConn CLOSE
+    LONG_HELP = """DB myDbConn COMMIT
     commits pending transactions in database connection"""
     @staticmethod
     def COMPLETION_STATE(input, pos):
@@ -99,7 +99,7 @@ class DbTables(base.StatementBase):
 
 class DbExecute(base.StatementBase):
     NAME = "DB EXECUTE"
-    SHORT_HELP = "DB myDbConn EXECUTE 'query' - closes database connection"
+    SHORT_HELP = "DB myDbConn EXECUTE 'query' - execute query discarding results"
     LONG_HELP = """DB myDbConn EXECUTE 'query'
     Executes generic database query"""
     @staticmethod
@@ -128,3 +128,6 @@ miner_globals.addKeyWord(keyword="EXECUTE")
 miner_globals.addHelpClass(DbConnect)
 miner_globals.addHelpClass(DbClose)
 miner_globals.addHelpClass(DbExecute)
+miner_globals.addHelpClass(DbCommit)
+miner_globals.addHelpClass(DbTables)
+
