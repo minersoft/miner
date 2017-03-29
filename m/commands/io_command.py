@@ -107,7 +107,7 @@ def p_store_in_variables(p):
 def _streamVarsParam(streamVars):
     if not streamVars or not len(streamVars):
         return ""
-    values = ", ".join(("'%s': %s" % item) for item in streamVars.iteritems())
+    values = ", ".join(("'%s': %s" % (item[0], repr(item[1]))) for item in streamVars.iteritems())
     return ", **{%s}" % values
 
 class Source(CommandBase):

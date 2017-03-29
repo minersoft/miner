@@ -70,4 +70,4 @@ class oLog(oRaw):
 
 class oTsv(oLog):
     def __init__(self, fileHandler, variableNames):
-        oLog.__init__(self, fileHandler, FS="\t")
+        oLog.__init__(self, fileHandler, variableNames, FS="\t")

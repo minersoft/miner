@@ -84,7 +84,7 @@ def %s():
         return self.cursor.close
 
 class DbPush(CommandBase):
-    NAME = "DB FETCH"
+    NAME = "DB PUSH"
     SHORT_HELP = "DB <db-connection> PUSH 'query' WITH params - inserts/updates data in database"
     LONG_HELP = """DB <db-connection>  PUSH 'query' WITH params
     Gets mining data from result of database query, e.g.

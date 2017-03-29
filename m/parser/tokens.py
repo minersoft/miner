@@ -177,7 +177,12 @@ if sys.platform != "win32":
 def t_files_STREAMVAR(t):
     r"""[_a-zA-Z]\w*=([^ \t"']+|"([^\\"]|(\\.))*"|'([^\\']|(\\.))*')"""
     equal = t.value.index('=')
-    t.value = (t.value[:equal], t.value[equal+1:])
+    value = t.value[equal+1:]
+    if value[0]=='"' or value[0]=="'":
+        value = value[1:-1]
+    value = value.decode('string_escape')
+        
+    t.value = (t.value[:equal], value)
     return t
 
 # This token is used to specify URIs, filenames or filename patterns

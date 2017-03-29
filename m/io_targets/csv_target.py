@@ -4,10 +4,10 @@ import csv
 import sys
 
 class iCSV(GeneratorBase):
-    def __init__(self, fileHandler, vars=None):
+    def __init__(self, fileHandler, vars=None, delimiter=","):
         GeneratorBase.__init__(self)
         self.myFileHandler = fileHandler
-        self.reader = csv.reader(self.myFileHandler)
+        self.reader = csv.reader(self.myFileHandler, delimiter=delimiter)
         if vars:
             self.myVars = vars.rstrip().split(",")
         else:

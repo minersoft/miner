@@ -112,9 +112,12 @@ class DbExecute(base.StatementBase):
         self.paramExpList = paramExpList
     def execute(self):
         m.db_connections.checkConnection(self.connectionId)
-        paramsExp = "(" + "".join((p.getValue()+", ") for p in self.paramExpList) + ")"
+        if self.paramExpList:
+            paramsExp = ", (" + "".join((p.getValue()+", ") for p in self.paramExpList) + ")"
+        else:
+            paramsExp = ""
         try:
-            miner_globals.execExpression("%s.execute(%s, %s)" % (self.connectionId, self.queryExp.getValue(), paramsExp))
+            miner_globals.execExpression("%s.execute(%s%s)" % (self.connectionId, self.queryExp.getValue(), paramsExp))
         except Exception as e:
             raise common.MiningError("Execution of DB query failed: %s" % str(e))
 
